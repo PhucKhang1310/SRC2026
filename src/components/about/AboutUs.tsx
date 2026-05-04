@@ -57,11 +57,10 @@ const AboutUs = () => {
               {images.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-6 h-1 rounded transition-all ${
-                    index === activeIndex
-                      ? "bg-gray-800 opacity-100"
-                      : "bg-gray-300 opacity-50"
-                  }`}
+                  className={`w-6 h-1 rounded transition-all ${index === activeIndex
+                    ? "bg-gray-800 opacity-100"
+                    : "bg-gray-300 opacity-50"
+                    }`}
                 />
               ))}
             </div>
@@ -119,11 +118,10 @@ const AboutUs = () => {
             {images.map((_, index) => (
               <div
                 key={index}
-                className={`w-1 h-6 rounded transition-all ${
-                  index === activeIndex
-                    ? "bg-gray-800 opacity-100"
-                    : "bg-gray-300 opacity-50"
-                }`}
+                className={`w-1 h-6 rounded transition-all ${index === activeIndex
+                  ? "bg-gray-800 opacity-100"
+                  : "bg-gray-300 opacity-50"
+                  }`}
               />
             ))}
           </div>
