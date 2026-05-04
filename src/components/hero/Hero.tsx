@@ -160,7 +160,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="relative mt-10 mb-10 z-20 flex w-full items-start justify-center bg-linear-to-b from-black/80 to-black">
+        <div className="relative mt-10  z-20 flex w-full items-start justify-center bg-linear-to-b from-black/80 to-black">
           <div className="grid grid-cols-6 w-full justify-center gap-y-6">
             {!isMobile && (
               <span className="col-span-6 font-extrabold text-white text-base mb-2 flex w-full justify-center gap-2 mt-6">
@@ -192,7 +192,7 @@ const Hero = () => {
                 <img src={resfes2025} alt="2025 Resfes Logo" className="w-100 h-28 object-contain" />
               </div>
             )}
-            <div className="col-span-6 text-center text-2xl">
+            <div className="col-span-6 text-center text-2xl pb-18">
               <h1 className="font-thin text-white ">
                 <span className="font-bold">Empowering minds</span>
                 {isMobile && <br />} to turn

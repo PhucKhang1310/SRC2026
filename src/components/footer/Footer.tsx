@@ -1,5 +1,7 @@
 import { FaEnvelope, FaFacebookF, FaPhone } from "react-icons/fa6";
+import fptUniversityLogo from '../../assets/logo-fptu.png'
 import fptLogoFixed from '../../assets/fpt_logo-removebg-preview_cropped.png'
+import resfes2025 from '../../assets/2025-RES FES-VUÔNG-WHITE.png'
 import { useCheckMobile } from "../../hook/useCheckMobile";
 
 const Footer = () => {
@@ -9,11 +11,17 @@ const Footer = () => {
       id="footer"
       className="flex flex-col items-center bg-neutral scroll-mt-24"
     >
-      <footer className={`${isMobile ? "" : "w-4/5"} footer sm:footer-horizontal bg-neutral text-neutral-content p-10`}>
-        <aside className="flex flex-col justify-center">
-          <div className="">
-            <img src={fptLogoFixed} className="w-1/3 scale-110" />
-          </div>
+      <footer className={`${isMobile ? "" : "w-4/5"} flex flex-col footer sm:footer-horizontal bg-neutral text-neutral-content p-10`}>
+        <div className="flex md:flex-row lg:flex-row flex-col items-center justify-center">
+          <img src={fptUniversityLogo} className="w-100 h-28 scale-110 object-contain justify-self-start" alt="FPTU logo" />
+          <img src={fptLogoFixed} className="w-100 h-36 scale-110 object-contain" alt="FPT 20 years logo" />
+          <img src={resfes2025} className="w-100 h-28 scale-110 object-contain" alt="resfes2025 logo" />
+        </div>
+
+        <div className="w-full h-px font-bold bg-white text-2xl lg:text-base "></div>
+
+
+        <aside className="w-full flex lg:flex-row md:flex-row justify-between">
           <div className=" font-bold text-2xl">
             Think bigger
             <p className="font-thin"> Build Smarter</p>
@@ -38,35 +46,35 @@ const Footer = () => {
               </a>
             </div>
           </div>
+          <nav className={`${isMobile ? "" : "justify-self-end"}`}>
+            {!isMobile && <p className="font-bold text-2xl mb-3">Contact us</p>}
+            <div className="flex sm:flex-col gap-5 mt-2">
+              <a
+                href="https://www.facebook.com/fpt.resfes"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 transition hover:text-orange-500"
+              >
+                <FaFacebookF className="text-lg" />
+                {!isMobile && <span>Follow us on Facebook</span>}
+              </a>
+              <a
+                href="mailto:src@fe.edu.vn"
+                className="flex items-center gap-3 transition hover:text-orange-500"
+              >
+                <FaEnvelope className="text-lg" />
+                {!isMobile && <span>Email us at src@fe.edu.vn</span>}
+              </a>
+              <a
+                href="tel:+842465549806"
+                className="flex items-center gap-3 transition hover:text-orange-500"
+              >
+                <FaPhone className="text-lg" />
+                {!isMobile && <span>(+84) 246.654.9806</span>}
+              </a>
+            </div>
+          </nav>
         </aside>
-        <nav className={`${isMobile ? "" : "justify-self-end"}`}>
-          <h6 className="footer-title">Contact Us</h6>
-          <div className="flex flex-col gap-3">
-            <a
-              href="https://www.facebook.com/fpt.resfes"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-3 transition hover:text-orange-500"
-            >
-              <FaFacebookF className="text-lg" />
-              <span>Follow us on Facebook</span>
-            </a>
-            <a
-              href="mailto:src@fe.edu.vn"
-              className="flex items-center gap-3 transition hover:text-orange-500"
-            >
-              <FaEnvelope className="text-lg" />
-              <span>src@fe.edu.vn</span>
-            </a>
-            <a
-              href="tel:+842465549806"
-              className="flex items-center gap-3 transition hover:text-orange-500"
-            >
-              <FaPhone className="text-lg" />
-              <span>(+84) 246.654.9806</span>
-            </a>
-          </div>
-        </nav>
       </footer>
       <div className="flex w-full justify-center">
         <div className="divider w-2/3" />
