@@ -1,6 +1,9 @@
 import workshopImage from "../../assets/resfes_tour.jpg";
+import { useCheckMobile } from "../../hook/useCheckMobile";
 
 const Workshops = () => {
+  const { isMobile } = useCheckMobile();
+
   return (
     <section id="workshops" className="scroll-mt-24 px-6 py-20 lg:px-10 ">
       <div
@@ -30,37 +33,34 @@ const Workshops = () => {
           <ul className="list mt-8 w-full rounded-2xl bg-black/50 backdrop-blur-sm border border-white/15 text-start">
             <li className="p-4 pb-2 text-xs opacity-60 tracking-wide text-white">Upcoming workshops — Sunday, 01.03.2026</li>
 
-            <li className="list-row border-white/10">
-
+            <li className={`list-row border-white/10 ${isMobile ? "flex flex-col" : ""}`} >
               <div>
                 <div className="text-white font-semibold">Research Methodology — Engineering</div>
                 <div className="text-xs uppercase font-semibold opacity-60 text-white/70">Dr. Ta Hoang Thang</div>
               </div>
-              <div className="flex flex-col items-end text-xs text-white/60">
+              <div className={`flex flex-col items-end text-xs text-white/60 ${isMobile ? 'items-start' : ''}`}>
                 <span>8:30 – 10:30</span>
                 <span className="text-orange-300">Hall Academic</span>
               </div>
             </li>
 
-            <li className="list-row border-white/10">
-
+            <li className={`list-row border-white/10 ${isMobile ? "flex flex-col" : ""}`} >
               <div>
                 <div className="text-white font-semibold">Research Methodology — Economics & Social Sciences</div>
                 <div className="text-xs uppercase font-semibold opacity-60 text-white/70">Dr. Le Ha Van</div>
               </div>
-              <div className="flex flex-col items-end text-xs text-white/60">
+              <div className={`flex flex-col items-end text-xs text-white/60 ${isMobile ? 'items-start' : ''}`}>
                 <span>8:30 – 10:30</span>
                 <span className="text-orange-300">Hall Business</span>
               </div>
             </li>
 
-            <li className="list-row border-white/10">
-
+            <li className={`list-row border-white/10 ${isMobile ? "flex flex-col" : ""}`} >
               <div>
                 <div className="text-white font-semibold">Reporting with LaTeX/Overleaf</div>
                 <div className="text-xs uppercase font-semibold opacity-60 text-white/70">PhD Candidate Pham Minh Tri</div>
               </div>
-              <div className="flex flex-col items-end text-xs text-white/60">
+              <div className={`flex flex-col items-end text-xs text-white/60 ${isMobile ? 'items-start' : ''}`}>
                 <span>10:30 – 12:00</span>
                 <span className="text-orange-300">Hall Academic</span>
               </div>
