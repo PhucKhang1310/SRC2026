@@ -8,6 +8,7 @@ import NavBar from "./components/navbar/NavBar";
 import Regulations from "./components/regulations/Regulations";
 import ResearchFields from "./components/research/ResearchFields";
 import News from "./components/news/News";
+import Publications from "./components/publications/Publications";
 import Workshops from "./components/workshops/Workshops";
 import LazyWrapper from "./components/wrapper/LazyWrapper";
 
@@ -62,6 +63,7 @@ const App = () => {
       <Regulations />
       <Milestones />
       <News />
+      <Publications />
       <LazyWrapper id="workshops">
         <Workshops />
       </LazyWrapper>
