@@ -54,8 +54,8 @@ const MentorList = ({
             />
           </div>
           <div>
-            <div className="font-semibold">{mentor.name}</div>
-            <div className="text-xs font-semibold uppercase opacity-60">
+            <div className="font-semibold uppercase">{mentor.name}</div>
+            <div className="text-xs font-semibold capitalize opacity-60">
               {mentor.role}
             </div>
           </div>
