@@ -1,7 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MentorList from "./MentorList";
 import { mentors } from "./mentorData";
+import Pagination from "../pagination/Pagination";
 import NavBar from "../navbar/NavBar";
+import Footer from "../footer/Footer";
 import {
   FaLaptopCode,
   FaLanguage,
@@ -37,6 +39,8 @@ const departmentIcons: Record<string, IconType> = {
 const Mentor = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeDepartment, setActiveDepartment] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const departments = useMemo(() => {
     const uniqueDepartments = new Set(
@@ -63,10 +67,20 @@ const Mentor = () => {
     });
   }, [activeDepartment, searchTerm]);
 
+  // Reset to page 1 when filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeDepartment, searchTerm]);
+
+  const paginatedMentors = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredMentors.slice(start, start + pageSize);
+  }, [filteredMentors, currentPage]);
+
   return (
-    <main className="min-h-screen bg-black px-6 py-50 text-amber-50 lg:px-10">
+    <main className="min-h-screen bg-black px-6 text-amber-50 lg:px-10">
       <NavBar />
-      <section className="mx-auto max-w-7xl">
+      <section className="mx-auto max-w-7xl pt-50 pb-16">
         <div className="mx-auto mb-12 max-w-3xl text-center">
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-amber-50/60">
             Mentors
@@ -109,7 +123,7 @@ const Mentor = () => {
         </div>
 
         <MentorList
-          mentors={filteredMentors}
+          mentors={paginatedMentors}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           departmentIcons={departmentIcons}
@@ -121,6 +135,16 @@ const Mentor = () => {
           </div>
         )}
 
+        {filteredMentors.length > pageSize && (
+          <Pagination
+            className="mt-10"
+            currentPage={currentPage}
+            totalCount={filteredMentors.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        )}
+
         <div className="mt-12 text-center">
           <a
             href="/"
@@ -130,6 +154,7 @@ const Mentor = () => {
           </a>
         </div>
       </section>
+      <Footer />
     </main>
   );
 };

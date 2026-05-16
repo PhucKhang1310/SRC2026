@@ -82,6 +82,9 @@ const NavBar = () => {
                     <a href="/home#news">News</a>
                   </li>
                   <li>
+                    <a href="/publications">Publications</a>
+                  </li>
+                  <li>
                     <a href="/home#awards">History</a>
                   </li>
                   <li>
