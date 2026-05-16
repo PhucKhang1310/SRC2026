@@ -1,7 +1,8 @@
 import { FaEnvelope, FaFacebookF, FaPhone } from "react-icons/fa6";
 import fptUniversityLogo from '../../assets/logo-fptu.png'
 import fptLogoFixed from '../../assets/fpt_logo-removebg-preview_cropped.png'
-import resfes2025 from '../../assets/2025-RES FES-VUÔNG-WHITE.png'
+// import resfes2025 from '../../assets/2025-RES FES-VUÔNG-WHITE.png'
+import resfes2026 from '../../assets/logo_src_white_nobg.png'
 import { useCheckMobile } from "../../hook/useCheckMobile";
 
 const Footer = () => {
@@ -9,13 +10,13 @@ const Footer = () => {
   return (
     <div
       id="footer"
-      className="flex flex-col items-center bg-neutral scroll-mt-24"
+      className="flex flex-col items-center justify-center bg-neutral scroll-mt-24 "
     >
       <footer className={`${isMobile ? "" : "w-4/5"} flex flex-col footer sm:footer-horizontal bg-neutral text-neutral-content p-10`}>
-        <div className="flex md:flex-row lg:flex-row flex-col items-center justify-center">
-          <img src={fptUniversityLogo} className="w-100 h-28 scale-110 object-contain justify-self-start" alt="FPTU logo" />
+        <div className="flex md:flex-row lg:flex-row flex-col items-center justify-between">
+          <img src={fptUniversityLogo} className="w-100 h-28 scale-110 object-contain" alt="FPTU logo" />
           <img src={fptLogoFixed} className="w-100 h-36 scale-110 object-contain" alt="FPT 20 years logo" />
-          <img src={resfes2025} className="w-100 h-28 scale-110 object-contain" alt="resfes2025 logo" />
+          <img src={resfes2026} className="w-100 h-28 scale-110 object-contain" alt="resfes2026 logo" />
         </div>
 
         <div className="w-full h-px font-bold bg-white text-2xl lg:text-base "></div>

@@ -18,9 +18,15 @@ const PublicationsList = () => {
   const { isMobile } = useCheckMobile();
 
   useEffect(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    setItems(publicationsData.slice(startIndex, endIndex));
+    const handlePageChange = () => {
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      setItems(publicationsData.slice(startIndex, endIndex));
+    };
+
+    handlePageChange();
+
+    return () => handlePageChange();
   }, [currentPage]);
 
   useEffect(() => {
@@ -61,16 +67,15 @@ const PublicationsList = () => {
           {items.map((pub) => (
             <article
               key={pub.id}
-              className="group py-5 transition-colors hover:bg-amber-50/[0.02] px-4 -mx-4 rounded"
+              className="group py-5 transition-colors hover:bg-amber-50/2 px-4 -mx-4 rounded"
             >
               <a
                 href={pub.newsId ? `/news-list/${pub.newsId}` : "#"}
                 className="block"
               >
                 <h2
-                  className={`font-bold leading-snug text-amber-50 group-hover:text-[#ff6a1f] transition-colors ${
-                    isMobile ? "text-sm" : "text-base"
-                  }`}
+                  className={`font-bold leading-snug text-amber-50 group-hover:text-[#ff6a1f] transition-colors ${isMobile ? "text-sm" : "text-base"
+                    }`}
                 >
                   {pub.title}
                 </h2>

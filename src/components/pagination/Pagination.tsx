@@ -44,9 +44,9 @@ const Pagination = ({
     const isNextDisabled = currentPage === lastPage;
 
     const baseItem =
-        'inline-flex h-10 min-w-10 items-center justify-center rounded-md border border-amber-50/20 bg-zinc-800 px-3 text-sm font-medium text-amber-50 transition-colors';
-    const hoverItem = 'hover:bg-zinc-700';
-    const selectedItem = 'bg-[#f27255] text-white border-transparent';
+        'inline-flex h-10 min-w-10 items-center justify-center rounded-md border border-amber-50/20  bg-zinc-800 px-3 text-sm font-medium text-amber-50 transition-colors';
+    const hoverItem = 'hover:bg-zinc-700 cursor-pointer';
+    const selectedItem = 'bg-[#f27255] text-white border border-white';
     const disabledItem = 'opacity-40 pointer-events-none';
 
     return (

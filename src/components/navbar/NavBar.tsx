@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import MobileMenu from "./MobileMenu";
 import { useCheckMobile } from "../../hook/useCheckMobile";
-import fptLogoFixed from "../../assets/fpt_logo-removebg-preview.png";
+import fptLogoFixed from "../../assets/fpt_logo-removebg-preview_cropped.png";
 
 const NavBar = () => {
   const { isMobile } = useCheckMobile();
@@ -116,13 +116,13 @@ const NavBar = () => {
           aria-label="Open menu"
           aria-expanded={isMenuOpen}
         >
-          <RxHamburgerMenu size={20} color="white" />
+          <RxHamburgerMenu size={25} color="white" />
         </button>
 
         <a href="/home" className="inline-flex items-center leading-none">
           <img
             src={fptLogoFixed}
-            className="block h-10 w-auto object-contain"
+            className="block h-15 w-auto object-contain"
           />
         </a>
       </header>

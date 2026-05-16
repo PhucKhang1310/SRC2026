@@ -18,7 +18,7 @@ const NewsList = () => {
     const location = useLocation();
     const { isMobile } = useCheckMobile();
     if (isMobile) {
-        pageSize = 5;
+        pageSize = 4;
     }
 
     useEffect(() => {

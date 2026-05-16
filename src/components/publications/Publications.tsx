@@ -25,17 +25,14 @@ const Publications = () => {
         {latestPubs.map((pub, index) => (
           <article
             key={pub.id}
-            className={`flex ${
-              isMobile ? "flex-col" : "flex-row"
-            } gap-0 ${
-              !isMobile && index % 2 !== 0 ? "flex-row-reverse" : ""
-            }`}
+            className={`flex ${isMobile ? "flex-col" : "flex-row"
+              } gap-0 ${!isMobile && index % 2 !== 0 ? "flex-row-reverse" : ""
+              }`}
           >
             {/* Journal cover image */}
             <div
-              className={`${
-                isMobile ? "w-full" : "w-[45%]"
-              } shrink-0 overflow-hidden`}
+              className={`${isMobile ? "w-full" : "w-[45%]"
+                } shrink-0 overflow-hidden`}
             >
               <img
                 src={pub.image}
@@ -47,13 +44,12 @@ const Publications = () => {
 
             {/* Content card — overlaps the image slightly on desktop */}
             <div
-              className={`relative flex flex-1 flex-col justify-center bg-white px-8 py-8 shadow-lg ${
-                isMobile
-                  ? "-mt-6 mx-4 rounded-md"
-                  : index % 2 !== 0
+              className={`relative flex flex-1 flex-col justify-center bg-white px-8 py-8 shadow-lg ${isMobile
+                ? "-mt-6 mx-4 rounded-md"
+                : index % 2 !== 0
                   ? "-mr-8 rounded-l-md"
                   : "-ml-8 rounded-r-md"
-              }`}
+                }`}
               style={
                 !isMobile
                   ? { marginTop: "2rem", marginBottom: "2rem" }
@@ -61,9 +57,9 @@ const Publications = () => {
               }
             >
               <span className="mb-2 text-xs font-bold uppercase tracking-widest text-teal-600">
-                News
+                Top Pick
               </span>
-              <h3 className="mb-3 text-xl font-bold leading-tight text-gray-900 md:text-2xl">
+              <h3 className="mb-3 text-xl font-bold leading-tight text-gray-900 md:text-2xl line-clamp-4">
                 {pub.title}
               </h3>
               <p className="mb-5 text-sm leading-relaxed text-gray-600 line-clamp-3">
