@@ -88,9 +88,8 @@ const News = () => {
                             </p>
                         </a>
 
-                        <div className="flex flex-col flex-1 p-2 gap-6 overflow-scroll h-128 overflow-x-hidden pt-0"
-                            style={{ scrollbarWidth: "none" }}                    >
-                            {loopedNews.map((newsItem, index) => (
+                        <div className="flex flex-col flex-1 p-2 gap-6 pt-0">
+                            {newsData.slice(0, 3).map((newsItem, index) => (
                                 <a key={`news-item-${index}-${newsItem.id}`} href={`/news-list/${newsItem.id}`}
                                     className="flex gap-4">
                                     <img
@@ -98,23 +97,22 @@ const News = () => {
                                         alt="News Image"
                                         className="w-55 h-35 object-cover"
                                     />
-                                    <div className="flex flex-col justify-between">
+                                    <div className="flex flex-col justify-start gap-1">
                                         <span className="font-semibold line-clamp-3">
                                             {newsItem.title}
                                         </span>
                                         <div className="flex flex-col">
-                                            <span className="font-semibold">
+                                            <span className="text-sm">
                                                 {newsItem.author}
                                             </span>
-                                            <span>
+                                            <span className="font-thin ">
                                                 {new Date(newsItem.date).toLocaleDateString("vi-VN")}
                                             </span>
                                         </div>
                                     </div>
                                 </a>
                             ))}
-                            <button className="w-full
-                         text-blue-500 px-4 py-2 rounded cursor-pointer" onClick={() => navigate("/news-list")}>
+                            <button className="self-end w-45 hover:underline px-4 py-2 rounded cursor-pointer" onClick={() => navigate("/news-list")}>
                                 Read all news
                                 <FaArrowRight className="inline-block ml-2" />
                             </button>
