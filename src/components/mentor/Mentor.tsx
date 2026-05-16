@@ -2,6 +2,37 @@ import { useMemo, useState } from "react";
 import MentorList from "./MentorList";
 import { mentors } from "./mentorData";
 import NavBar from "../navbar/NavBar";
+import {
+  FaLaptopCode,
+  FaLanguage,
+  FaChalkboardUser,
+  FaLightbulb,
+  FaPaintbrush,
+  FaMicrochip,
+  FaBriefcase,
+  FaCalculator,
+  FaHandshake,
+  FaCode,
+  FaGlobe,
+  FaListUl,
+} from "react-icons/fa6";
+import type { IconType } from "react-icons";
+
+const departmentIcons: Record<string, IconType> = {
+  "All": FaListUl,
+  "Computing Fundamental": FaLaptopCode,
+  "English": FaLanguage,
+  "English Preparation Course": FaChalkboardUser,
+  "Entrepreneurship Development": FaLightbulb,
+  "Graphic Design": FaPaintbrush,
+  "Information Technology": FaMicrochip,
+  "Information Technology Specialization": FaMicrochip,
+  "International Business": FaBriefcase,
+  "Japanese": FaGlobe,
+  "Mathematics": FaCalculator,
+  "Soft Skill": FaHandshake,
+  "Software Engineering": FaCode,
+};
 
 const Mentor = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,20 +83,24 @@ const Mentor = () => {
 
         <div className="mb-8 space-y-4 text-amber-50">
           <div className="filter mx-auto flex max-w-7xl flex-wrap justify-center gap-2">
-            {departments.map((department) => (
-              <button
-                key={department}
-                type="button"
-                onClick={() => setActiveDepartment(department)}
-                className={`btn btn-sm rounded-full border ${
-                  activeDepartment === department
-                    ? "border-white bg-white text-black hover:bg-white/90"
-                    : "border-white bg-transparent text-white hover:bg-white hover:text-black"
-                }`}
-              >
-                {department}
-              </button>
-            ))}
+            {departments.map((department) => {
+              const Icon = departmentIcons[department];
+              return (
+                <button
+                  key={department}
+                  type="button"
+                  onClick={() => setActiveDepartment(department)}
+                  className={`btn btn-sm rounded-full border flex items-center gap-1.5 ${
+                    activeDepartment === department
+                      ? "border-white bg-white text-black hover:bg-white/90"
+                      : "border-white bg-transparent text-white hover:bg-white hover:text-black"
+                  }`}
+                >
+                  {Icon && <Icon className="size-3.5" />}
+                  {department}
+                </button>
+              );
+            })}
           </div>
 
           <p className="text-sm text-amber-50/70">
@@ -77,6 +112,7 @@ const Mentor = () => {
           mentors={filteredMentors}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
+          departmentIcons={departmentIcons}
         />
 
         {filteredMentors.length === 0 && (
