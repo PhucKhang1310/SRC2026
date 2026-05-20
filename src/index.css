@@ -83,6 +83,15 @@ html {
   }
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 /* ========================REUSABLE CLASSES=========================== */
 
 .flicker-letter {
@@ -101,6 +110,10 @@ html {
   animation-duration: 0.5s;
   animation-timing-function: ease-in-out;
   animation-fill-mode: forwards;
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
 }
 
 img,

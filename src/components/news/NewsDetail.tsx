@@ -67,7 +67,7 @@ const NewsDetail = () => {
                 )}
             </section>
 
-            <div className=" mx-auto ">
+            <div className="w-3/4 mx-auto">
                 <h3 className="text-2xl font-bold mt-10">Related News</h3>
                 <div className=" mx-auto pb-20">
                     <div className="mt-6 grid grid-cols-12 gap-8">

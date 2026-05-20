@@ -2,6 +2,7 @@ import {
   FaChartLine,
   FaLanguage,
   FaLaptopCode,
+  FaMicrochip,
   FaPalette,
 } from "react-icons/fa6";
 
@@ -17,32 +18,43 @@ const ResearchAccordion = ({
   const fields = [
     {
       icon: FaLaptopCode,
-      title: "Information Technology, Semiconductor IC and Digital Automotive",
+      title: "Information Technology",
       items: [
-        "Information Technology",
-        "Semiconductor IC",
-        "Digital Automotive",
+        "Software Engineering",
+        "Artificial Intelligence",
+        "Data Science & Analytics",
+        "Information Systems",
+      ],
+    },
+    {
+      icon: FaMicrochip,
+      title: "Semiconductor IC & Digital Automotive",
+      items: [
+        "Semiconductor IC Design",
+        "Digital Automotive Systems",
+        "Embedded Systems",
       ],
     },
     {
       icon: FaPalette,
-      title: "Graphic Design and Multimedia Communication",
-      items: ["Graphic Design", "Multimedia Communication"],
+      title: "Graphic Design & Digital Art, Multimedia Communication",
+      items: [
+        "Graphic Design & Digital Art",
+        "Multimedia Communication",
+      ],
     },
     {
       icon: FaChartLine,
-      title: "Economics and Business Administration",
+      title: "Economics & Business Administration",
       items: ["Economics", "Business Administration"],
     },
     {
       icon: FaLanguage,
-      title: "English Language",
-      items: ["English Language Studies and research topics"],
-    },
-    {
-      icon: FaLanguage,
-      title: "Japanese Language",
-      items: ["Japanese Language Studies and research topics"],
+      title: "Languages (English & Japanese)",
+      items: [
+        "English Language Studies and research topics",
+        "Japanese Language Studies and research topics",
+      ],
     },
   ];
 

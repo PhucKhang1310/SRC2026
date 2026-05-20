@@ -24,8 +24,8 @@ interface SubCommittee {
 
 const subCommittees: SubCommittee[] = [
   {
-    name: "Information Technology, Semiconductor & Digital Automotive",
-    nameVi: "Công nghệ thông tin, Vi mạch bán dẫn và Ô tô số",
+    name: "Information Technology",
+    nameVi: "Công nghệ thông tin",
     color: "from-blue-500 to-cyan-400",
     accentGradient: "from-blue-500/20 to-cyan-400/10",
     borderColor: "border-blue-400/30",
@@ -45,8 +45,23 @@ const subCommittees: SubCommittee[] = [
     ],
   },
   {
-    name: "Graphic Design & Multimedia Communication",
-    nameVi: "Thiết kế đồ hoạ & Truyền thông đa phương tiện",
+    name: "Semiconductor IC & Digital Automotive",
+    nameVi: "Vi mạch bán dẫn và ô tô số",
+    color: "from-indigo-500 to-blue-400",
+    accentGradient: "from-indigo-500/20 to-blue-400/10",
+    borderColor: "border-indigo-400/30",
+    standardAwards: [
+      { label: "1st Prize", amount: "10,000,000 VND", count: 1, icon: "trophy", color: "text-yellow-300" },
+      { label: "2nd Prize", amount: "6,000,000 VND", count: 1, icon: "medal", color: "text-gray-300" },
+      { label: "3rd Prize", amount: "4,000,000 VND", count: 1, icon: "medal", color: "text-amber-600" },
+    ],
+    smallAwards: [
+      { label: "Khơi nguồn Tri thức", amount: "6,000,000 VND", count: 1, icon: "medal", color: "text-white" },
+    ],
+  },
+  {
+    name: "Graphic Design & Digital Art, Multimedia Communication",
+    nameVi: "Thiết kế đồ hoạ & mỹ thuật số, Công nghệ truyền thông",
     color: "from-pink-500 to-rose-400",
     accentGradient: "from-pink-500/20 to-rose-400/10",
     borderColor: "border-pink-400/30",
@@ -75,26 +90,11 @@ const subCommittees: SubCommittee[] = [
     ],
   },
   {
-    name: "English Language",
-    nameVi: "Ngôn ngữ Anh",
+    name: "Languages (English & Japanese)",
+    nameVi: "Ngôn ngữ (Ngôn ngữ Anh, Ngôn ngữ Nhật)",
     color: "from-violet-500 to-purple-400",
     accentGradient: "from-violet-500/20 to-purple-400/10",
     borderColor: "border-violet-400/30",
-    standardAwards: [
-      { label: "1st Prize", amount: "10,000,000 VND", count: 1, icon: "trophy", color: "text-yellow-300" },
-      { label: "2nd Prize", amount: "6,000,000 VND", count: 1, icon: "medal", color: "text-gray-300" },
-      { label: "3rd Prize", amount: "4,000,000 VND", count: 1, icon: "medal", color: "text-amber-600" },
-    ],
-    smallAwards: [
-      { label: "Khơi nguồn Tri thức", amount: "6,000,000 VND", count: 1, icon: "medal", color: "text-white" },
-    ],
-  },
-  {
-    name: "Japanese Language",
-    nameVi: "Ngôn ngữ Nhật",
-    color: "from-red-500 to-orange-400",
-    accentGradient: "from-red-500/20 to-orange-400/10",
-    borderColor: "border-red-400/30",
     standardAwards: [
       { label: "1st Prize", amount: "10,000,000 VND", count: 1, icon: "trophy", color: "text-yellow-300" },
       { label: "2nd Prize", amount: "6,000,000 VND", count: 1, icon: "medal", color: "text-gray-300" },

@@ -9,12 +9,21 @@ import fptLogoFixed from "../../assets/fpt_logo-removebg-preview_cropped.png";
 
 const Hero = () => {
   const { isMobile } = useCheckMobile()
-  const initialSeconds = 15 * 24 * 60 * 60 + 10 * 60 * 60 + 24 * 60 + 59;
-  const [totalSeconds, setTotalSeconds] = useState(initialSeconds);
+
+  // Countdown to registration deadline: 01.06.2026
+  const targetDate = new Date("2026-06-01T23:59:59+07:00").getTime();
+
+  const calculateTimeLeft = () => {
+    const now = Date.now();
+    const diff = Math.max(0, Math.floor((targetDate - now) / 1000));
+    return diff;
+  };
+
+  const [totalSeconds, setTotalSeconds] = useState(calculateTimeLeft);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setTotalSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+      setTotalSeconds(calculateTimeLeft());
     }, 1000);
 
     return () => window.clearInterval(timer);
@@ -79,6 +88,7 @@ const Hero = () => {
                     </span>
                   </span>
                 </div>
+                <p className="text-xs text-white/50 mb-2 tracking-wide">Registration closes 01.06.2026</p>
                 <div className={`grid grid-flow-col gap-2 text-center auto-cols-max lg:gap-5 `}>
                   <div className="flex flex-col p-2 bg-[#111827] rounded-box text-neutral-content">
                     <span className="countdown font-mono text-5xl">
@@ -136,15 +146,7 @@ const Hero = () => {
                     rel="noreferrer"
                     className="btn mt-8 rounded-full border-0 bg-orange-600 px-8 text-white hover:bg-orange-600/90"
                   >
-                    Register FPTers
-                  </a>
-                  <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLScZllL6Ewl8_tId9eMffO2UgYer41U3_6LjW0-SmYNVi2ocnw/viewform"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-outline mt-8 rounded-full bg-transparent px-8 hover:border-transparent text-amber-500 hover:bg-amber-100 hover:text-amber-400"
-                  >
-                    Register Non-FPTers
+                    Register Now
                   </a>
                 </div>
               </div>

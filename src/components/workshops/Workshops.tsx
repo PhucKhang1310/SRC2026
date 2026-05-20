@@ -21,48 +21,24 @@ const Workshops = () => {
           <h2 className="text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
             Scientific Research Guidance Workshops
           </h2>
-          <a
-            href="https://forms.gle/uDwrApEKfoRjaobb8"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn mt-6 rounded-full border-0 bg-orange-600 px-8 text-base text-white hover:bg-orange-600/90"
-          >
-            Register for Workshop
-          </a>
+          <p className="mt-4 text-sm text-white/60 max-w-xl">
+            Hướng dẫn thông tin chương trình và phổ biến. Nếu sinh viên có thắc mắc có thể đến Phòng Lab để được FARPC hỗ trợ.
+          </p>
 
           <ul className="list mt-8 w-full rounded-2xl bg-black/50 backdrop-blur-sm border border-white/15 text-start">
-            <li className="p-4 pb-2 text-xs opacity-60 tracking-wide text-white">Upcoming workshops — Sunday, 01.03.2026</li>
-
-            <li className={`list-row border-white/10 ${isMobile ? "flex flex-col" : ""}`} >
-              <div>
-                <div className="text-white font-semibold">Research Methodology — Engineering</div>
-                <div className="text-xs uppercase font-semibold opacity-60 text-white/70">Dr. Ta Hoang Thang</div>
-              </div>
-              <div className={`flex flex-col items-end text-xs text-white/60 ${isMobile ? 'items-start' : ''}`}>
-                <span>8:30 – 10:30</span>
-                <span className="text-orange-300">Hall Academic</span>
-              </div>
+            <li className="p-4 pb-2 text-xs opacity-60 tracking-wide text-white">
+              Upcoming workshop — Thursday, 22.05.2026
+              <span className="ml-2 text-orange-300 italic">(Date may change after Preliminary Round)</span>
             </li>
 
             <li className={`list-row border-white/10 ${isMobile ? "flex flex-col" : ""}`} >
               <div>
-                <div className="text-white font-semibold">Research Methodology — Economics & Social Sciences</div>
-                <div className="text-xs uppercase font-semibold opacity-60 text-white/70">Dr. Le Ha Van</div>
+                <div className="text-white font-semibold">Scientific Research Guidance Workshop</div>
+                <div className="text-xs uppercase font-semibold opacity-60 text-white/70">Competition Rules, Submission Guidelines & More</div>
               </div>
               <div className={`flex flex-col items-end text-xs text-white/60 ${isMobile ? 'items-start' : ''}`}>
-                <span>8:30 – 10:30</span>
-                <span className="text-orange-300">Hall Business</span>
-              </div>
-            </li>
-
-            <li className={`list-row border-white/10 ${isMobile ? "flex flex-col" : ""}`} >
-              <div>
-                <div className="text-white font-semibold">Reporting with LaTeX/Overleaf</div>
-                <div className="text-xs uppercase font-semibold opacity-60 text-white/70">PhD Candidate Pham Minh Tri</div>
-              </div>
-              <div className={`flex flex-col items-end text-xs text-white/60 ${isMobile ? 'items-start' : ''}`}>
-                <span>10:30 – 12:00</span>
-                <span className="text-orange-300">Hall Academic</span>
+                <span>22.05.2026</span>
+                <span className="text-orange-300">TBA</span>
               </div>
             </li>
           </ul>

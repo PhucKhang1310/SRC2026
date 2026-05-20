@@ -8,16 +8,25 @@ interface ResearchCarouselProps {
 const ResearchCarousel = ({ carouselRef, onScroll }: ResearchCarouselProps) => {
   const carouselItems = [
     {
-      title: "Information Technology, Semiconductor IC and Digital Automotive",
+      title: "Information Technology",
       items: [
         "AI-powered campus assistant for student services and advising",
-        "Low-power semiconductor prototype for edge sensing workloads",
-        "Digital twin simulation for predictive automotive maintenance",
         "Secure IoT architecture for smart classroom infrastructure",
+        "Full-stack web and mobile application development",
+        "Data Science, Machine Learning and Analytics",
       ],
     },
     {
-      title: "Graphic Design and Multimedia Communication",
+      title: "Semiconductor IC & Digital Automotive",
+      items: [
+        "Low-power semiconductor prototype for edge sensing workloads",
+        "Digital twin simulation for predictive automotive maintenance",
+        "Embedded systems design and optimization",
+        "VLSI circuit design and verification",
+      ],
+    },
+    {
+      title: "Graphic Design & Digital Art, Multimedia Communication",
       items: [
         "Brand identity system for science communication campaigns",
         "Short-form multimedia storytelling for public research impact",
@@ -26,7 +35,7 @@ const ResearchCarousel = ({ carouselRef, onScroll }: ResearchCarouselProps) => {
       ],
     },
     {
-      title: "Economics and Business Administration",
+      title: "Economics & Business Administration",
       items: [
         "Consumer behavior analysis for education technology adoption",
         "Financial feasibility model for student-led startup ideas",
@@ -35,21 +44,12 @@ const ResearchCarousel = ({ carouselRef, onScroll }: ResearchCarouselProps) => {
       ],
     },
     {
-      title: "English Language",
+      title: "Languages (English & Japanese)",
       items: [
         "Project-based English writing outcomes in research contexts",
         "Academic presentation anxiety and speaking performance factors",
-        "Corpus-informed vocabulary development for undergraduates",
-        "Peer feedback patterns in collaborative language learning",
-      ],
-    },
-    {
-      title: "Japanese Language",
-      items: [
         "Pragmatics in Japanese business email communication",
-        "Kanji retention improvement through spaced repetition methods",
         "Intercultural communication challenges in JP-VN teamwork",
-        "Role-play-based speaking fluency in beginner cohorts",
       ],
     },
   ];
