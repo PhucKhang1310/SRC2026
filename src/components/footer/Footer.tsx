@@ -23,13 +23,13 @@ const Footer = () => {
             <div className="flex min-w-[100vw] md:min-w-[80vw] lg:min-w-[1280px] shrink-0 items-center justify-around px-4">
               <img src={fptUniversityLogo} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="FPTU logo" />
               <img src={fptLogoFixed} className="h-28 sm:h-32 lg:h-36 scale-110 object-contain" alt="FPT 20 years logo" />
-              <img src={resfes2025} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="resfes2025 logo" />
+              <img src={resfes2026} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="resfes2026 logo" />
             </div>
             {/* Set 2 */}
             <div className="flex min-w-[100vw] md:min-w-[80vw] lg:min-w-[1280px] shrink-0 items-center justify-around px-4" aria-hidden="true">
               <img src={fptUniversityLogo} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="FPTU logo" />
               <img src={fptLogoFixed} className="h-28 sm:h-32 lg:h-36 scale-110 object-contain" alt="FPT 20 years logo" />
-              <img src={resfes2025} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="resfes2025 logo" />
+              <img src={resfes2026} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="resfes2026 logo" />
             </div>
           </div>
         </div>
