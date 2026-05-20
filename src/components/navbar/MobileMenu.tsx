@@ -24,6 +24,10 @@ const listItem = [
     label: "Workshops",
   },
   {
+    href: "/publications",
+    label: "Publications",
+  },
+  {
     href: "/mentors",
     label: "Mentors",
   },

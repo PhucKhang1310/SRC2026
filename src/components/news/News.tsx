@@ -26,7 +26,6 @@ const News = () => {
 
       {isMobile ? (
         <div className="w-4/5 max-w-xl">
-          <p className="text-xl font-semibold text-black mb-4">Top stories</p>
 
           <button
             type="button"
@@ -41,7 +40,7 @@ const News = () => {
           </button>
 
           <div className="mt-6 space-y-4">
-            {loopedNews.slice(1, 6).map((newsItem, index) => (
+            {loopedNews.slice(1, 4).map((newsItem, index) => (
               <button
                 key={`mobile-news-${index}-${newsItem.id}`}
                 type="button"
@@ -54,32 +53,17 @@ const News = () => {
                   className="w-28 h-20 object-cover shrink-0"
                 />
                 <div className="min-w-0">
-                  <p className="text-xs text-blue-600 font-medium">SRC 2026</p>
-                  <p className="mt-1 font-semibold text-black line-clamp-2">
+                  <p className=" font-semibold text-black line-clamp-2">
                     {newsItem.title}
                   </p>
                 </div>
               </button>
             ))}
-            <button
-              className="self-end w-45 hover:underline px-4 py-2 rounded cursor-pointer"
-              onClick={() => navigate("/news-list")}
-            >
-              Read all news
-              <FaArrowRight className="inline-block ml-2" />
-            </button>
-            <button
-              className="self-end w-45 hover:underline px-4 py-2 rounded cursor-pointer"
-              onClick={() => navigate("/news-list")}
-            >
-              Read all news
-              <FaArrowRight className="inline-block ml-2" />
-            </button>
           </div>
 
           <button
             type="button"
-            className="mt-6 w-full text-blue-600 px-4 py-2 rounded cursor-pointer text-left"
+            className="mt-6 w-full text-blue-600 py-2 rounded cursor-pointer text-left"
             onClick={() => navigate("/news-list")}
           >
             Read all news
@@ -100,7 +84,7 @@ const News = () => {
             </a>
 
             <div className="flex-1 flex flex-col p-2 pt-0 justify-between">
-              {newsData.slice(0, 3).map((newsItem, index) => (
+              {newsData.slice(1, 4).map((newsItem, index) => (
                 <a
                   key={`news-item-${index}-${newsItem.id}`}
                   href={`/news-list/${newsItem.id}`}
@@ -125,7 +109,7 @@ const News = () => {
                 </a>
               ))}
               <button
-                className="self-end hover:underline px-4 py-2 rounded cursor-pointer"
+                className="self-start hover:underline  rounded cursor-pointer"
                 onClick={() => navigate("/news-list")}
               >
                 Read all news
