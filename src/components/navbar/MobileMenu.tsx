@@ -31,6 +31,10 @@ const listItem = [
     href: "/mentors",
     label: "Mentors",
   },
+  {
+    href: "/submit",
+    label: "Submit",
+  },
 ];
 
 type MobileMenuProps = {

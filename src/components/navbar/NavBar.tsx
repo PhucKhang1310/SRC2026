@@ -90,6 +90,9 @@ const NavBar = () => {
                   <li>
                     <a href="/mentors">Mentors</a>
                   </li>
+                  <li>
+                    <a href="/submit">Submit</a>
+                  </li>
                 </ul>
               </div>
             </div>

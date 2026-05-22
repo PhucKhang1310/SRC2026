@@ -2,10 +2,13 @@ import type { MentorItem } from "../data/mentorData";
 import type { PublicationItem } from "../data/publicationsData";
 
 const API_BASE_URL = "https://src2026backendmain.vercel.app";
+const SUBMIT_API_BASE_URL = "http://localhost:3000";
 
 export const API_ENDPOINTS = {
   mentors: `${API_BASE_URL}/mentor`,
+  mentorSubmit: `${SUBMIT_API_BASE_URL}/mentor/submit`,
   publications: `${API_BASE_URL}/publication`,
+  publicationSubmit: `${SUBMIT_API_BASE_URL}/publication/submit`,
 } as const;
 
 type ApiRecord = Record<string, unknown>;
@@ -261,6 +264,72 @@ export const fetchMentors = async (signal?: AbortSignal) => {
 
   return mentors;
 };
+
+const submitJson = async <Payload>(
+  endpoint: string,
+  payload: Payload,
+  signal?: AbortSignal
+) => {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Submission failed with ${response.status}`);
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (contentType?.includes("application/json")) {
+    return response.json();
+  }
+
+  return response.text();
+};
+
+export type MentorSubmissionPayload = {
+  title: string;
+  fullName: string;
+  department: string;
+  phone: string;
+  email: string;
+  personalWebsite: string;
+  orcid: string;
+  researchGate: string;
+  googleScholar: string;
+  researchAreas: string;
+  researchTopics: string;
+  note: string;
+  avatarImage: string;
+};
+
+export type PublicationSubmissionPayload = {
+  publishTitle: string;
+  author: string;
+  publishDate: string;
+  content: string;
+  authorGmail: string;
+  doi: string;
+  journal: string;
+  images?: {
+    url: string;
+    publicId: string;
+  }[];
+};
+
+export const submitMentor = (
+  payload: MentorSubmissionPayload,
+  signal?: AbortSignal
+) => submitJson(API_ENDPOINTS.mentorSubmit, payload, signal);
+
+export const submitPublication = (
+  payload: PublicationSubmissionPayload,
+  signal?: AbortSignal
+) => submitJson(API_ENDPOINTS.publicationSubmit, payload, signal);
 
 export const parsePublicationDate = (date: string) => {
   const parsedDate = new Date(date);

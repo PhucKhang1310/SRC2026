@@ -95,7 +95,7 @@ const MentorList = ({
                 </div>
               )}
               <div className="min-w-0 flex-1 overflow-hidden">
-                <h3 className="line-clamp-1 text-base font-bold uppercase tracking-wide text-amber-50 [overflow-wrap:anywhere]">
+                <h3 className="line-clamp-1 text-base font-bold uppercase tracking-wide text-amber-50 wrap-anywhere">
                   {mentor.name}
                 </h3>
                 <div className="mt-1 flex items-start gap-1.5 overflow-hidden text-sm text-amber-400/80">
@@ -104,7 +104,7 @@ const MentorList = ({
                     const DeptIcon = departmentIcons?.[dept] ?? FaGraduationCap;
                     return <DeptIcon className="mt-0.5 size-3.5 shrink-0" />;
                   })()}
-                  <span className="line-clamp-2 [overflow-wrap:anywhere]">
+                  <span className="line-clamp-2 wrap-anywhere">
                     {mentor.role}
                   </span>
                 </div>
@@ -121,7 +121,7 @@ const MentorList = ({
             >
               <FaFlask className="mt-0.5 size-3.5 shrink-0 text-amber-400/60" />
               <p
-                className={`ml-2.5 text-sm leading-relaxed text-amber-50/70 [overflow-wrap:anywhere] ${
+                className={`ml-2.5 text-sm leading-relaxed text-amber-50/70 wrap-anywhere ${
                   isExpanded
                     ? "overflow-visible"
                     : "overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:4]"

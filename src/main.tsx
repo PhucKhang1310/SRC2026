@@ -8,6 +8,7 @@ import NewsList from "./components/news/NewsList.tsx";
 import NewsDetail from "./components/news/NewsDetail.tsx";
 import PublicationDetail from "./components/publications/PublicationDetail.tsx";
 import PublicationsList from "./components/publications/PublicationsList.tsx";
+import SubmissionPage from "./components/submission/SubmissionPage.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -20,6 +21,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/news-list/:id" element={<NewsDetail />} />
         <Route path="/publications" element={<PublicationsList />} />
         <Route path="/publications/:id" element={<PublicationDetail />} />
+        <Route path="/submit" element={<SubmissionPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
