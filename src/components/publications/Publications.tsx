@@ -1,12 +1,35 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa6";
-import { publicationsData } from "../../data/publicationsData";
+import { fetchPublications, parsePublicationDate } from "../../api/api";
+import type { PublicationItem } from "../../data/publicationsData";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 
 const Publications = () => {
   const navigate = useNavigate();
   const { isMobile } = useCheckMobile();
-  const latestPubs = publicationsData.slice(0, 3);
+  const [latestPubs, setLatestPubs] = useState<PublicationItem[]>([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadPublications = async () => {
+      try {
+        const publications = await fetchPublications(controller.signal);
+        setLatestPubs(publications.slice(0, 3));
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setLatestPubs([]);
+      }
+    };
+
+    void loadPublications();
+
+    return () => controller.abort();
+  }, []);
 
   return (
     <section
@@ -57,7 +80,7 @@ const Publications = () => {
               }
             >
               <span className="mb-2 text-xs font-bold uppercase tracking-widest text-teal-600">
-                Top Pick
+                Latest
               </span>
               <h3 className="mb-3 text-xl font-bold leading-tight text-gray-900 md:text-2xl line-clamp-4">
                 {pub.title}
@@ -67,7 +90,7 @@ const Publications = () => {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium uppercase tracking-wider text-gray-400">
-                  {new Date(pub.date).toLocaleDateString("en-US", {
+                  {parsePublicationDate(pub.date).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
@@ -77,11 +100,7 @@ const Publications = () => {
                   type="button"
                   className="group flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 transition-colors hover:text-teal-600 cursor-pointer"
                   onClick={() =>
-                    navigate(
-                      pub.newsId
-                        ? `/news-list/${pub.newsId}`
-                        : "/news-list"
-                    )
+                    navigate(`/publications/${encodeURIComponent(pub.id)}`)
                   }
                 >
                   Keep Reading

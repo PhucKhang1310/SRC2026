@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import Mentor from "./components/mentor/Mentor";
 import NewsList from "./components/news/NewsList.tsx";
 import NewsDetail from "./components/news/NewsDetail.tsx";
+import PublicationDetail from "./components/publications/PublicationDetail.tsx";
 import PublicationsList from "./components/publications/PublicationsList.tsx";
 
 createRoot(document.getElementById("root")!).render(
@@ -18,6 +19,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/news-list" element={<NewsList />} />
         <Route path="/news-list/:id" element={<NewsDetail />} />
         <Route path="/publications" element={<PublicationsList />} />
+        <Route path="/publications/:id" element={<PublicationDetail />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

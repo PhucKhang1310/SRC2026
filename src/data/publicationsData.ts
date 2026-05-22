@@ -1,11 +1,13 @@
 export interface PublicationItem {
-  id: number;
+  id: number | string;
   title: string;
   journalName: string;
   description: string;
   date: string;
   source: string;
   image: string;
+  content?: string;
+  author?: string;
   newsId?: number;
 }
 

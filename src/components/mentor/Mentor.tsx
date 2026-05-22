@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import MentorList from "./MentorList";
+import { fetchMentors } from "../../api/api";
 import type { MentorItem } from "../../data/mentorData";
 import Pagination from "../pagination/Pagination";
 import NavBar from "../navbar/NavBar";
@@ -36,135 +37,6 @@ const departmentIcons: Record<string, IconType> = {
   "Software Engineering": FaCode,
 };
 
-const mentorsEndpoint =
-  "https://src2026backendmain.vercel.app/mentor";
-
-type MentorApiRecord = Record<string, unknown>;
-
-const readString = (
-  record: MentorApiRecord,
-  fields: string[],
-  fallback?: string
-): string => {
-  for (const field of fields) {
-    const value = record[field];
-    if (typeof value === "string" && value.trim().length > 0) {
-      return value.trim();
-    }
-  }
-
-  return fallback ?? "";
-};
-
-const readLinks = (record: MentorApiRecord): NonNullable<MentorItem["links"]> => {
-  const links =
-    record.links && typeof record.links === "object"
-      ? (record.links as MentorApiRecord)
-      : {};
-
-  return {
-    website: readString(record, ["website", "websiteUrl", "profileUrl"]) ||
-      readString(record, ["Personal Website"]) ||
-      readString(links, ["website", "websiteUrl", "profileUrl"]),
-    orcid:
-      readString(record, ["orcid", "orcidUrl"]) ||
-      readString(record, ["OrCID"]) ||
-      readString(links, ["orcid", "orcidUrl"]),
-    researchgate:
-      readString(record, ["researchgate", "researchGate", "researchGateUrl"]) ||
-      readString(record, ["ResearchGate"]) ||
-      readString(links, ["researchgate", "researchGate", "researchGateUrl"]),
-    googleScholar:
-      readString(record, [
-        "googleScholar",
-        "google_scholar",
-        "googleScholarUrl",
-      ]) ||
-      readString(record, ["Google Scholar"]) ||
-      readString(links, [
-        "googleScholar",
-        "google_scholar",
-        "googleScholarUrl",
-      ]),
-  };
-};
-
-const getMentorRecords = (payload: unknown): unknown[] => {
-  if (Array.isArray(payload)) {
-    return payload;
-  }
-
-  if (payload && typeof payload === "object") {
-    const record = payload as MentorApiRecord;
-    const wrappedList =
-      record.mentors ?? record.data ?? record.items ?? record.results;
-
-    if (Array.isArray(wrappedList)) {
-      return wrappedList;
-    }
-  }
-
-  return [];
-};
-
-const normalizeMentors = (payload: unknown): MentorItem[] =>
-  getMentorRecords(payload)
-    .map<MentorItem | null>((item) => {
-      if (!item || typeof item !== "object") {
-        return null;
-      }
-
-      const record = item as MentorApiRecord;
-      const department = readString(record, [
-        "department",
-        "field",
-        "major",
-        "faculty",
-        "Department (Đơn vị công tác)",
-      ]);
-      const title = readString(record, [
-        "title",
-        "degree",
-        "position",
-        "Title (Học hàm/học vị)",
-      ]);
-      const role =
-        readString(record, ["role"]) ||
-        [title, department].filter(Boolean).join(" | ") ||
-        "Mentor";
-      const links = readLinks(record);
-      const hasLinks = Object.values(links).some(Boolean);
-      const researchAreas = readString(record, [
-        "researchArea",
-        "researchAreas",
-        "expertise",
-        "Research Areas (Lĩnh vực nghiên cứu chính)",
-      ]);
-      const researchTopics = readString(record, [
-        "researchTopic",
-        "researchTopics",
-        "Research Topics (Hướng nghiên cứu cụ thể)",
-      ]);
-      const image = readString(
-        record,
-        ["image", "imageUrl", "photo", "photoUrl", "avatar", "avatarUrl"]
-      );
-
-      return {
-        name: readString(
-          record,
-          ["name", "fullName", "fullname", "Full Name (Họ và tên)"]
-        ),
-        role,
-        description:
-          readString(record, ["description", "bio"]) ||
-          [researchAreas, researchTopics].filter(Boolean).join(". "),
-        ...(image ? { image } : {}),
-        ...(hasLinks ? { links } : {}),
-      };
-    })
-    .filter((mentor): mentor is MentorItem => Boolean(mentor?.name));
-
 const Mentor = () => {
   const [mentors, setMentors] = useState<MentorItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -177,27 +49,12 @@ const Mentor = () => {
   useEffect(() => {
     const controller = new AbortController();
 
-    const fetchMentors = async () => {
+    const loadMentors = async () => {
       try {
         setIsLoading(true);
         setFetchError("");
 
-        const response = await fetch(mentorsEndpoint, {
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Mentors request failed with ${response.status}`);
-        }
-
-        const payload = await response.json();
-        const remoteMentors = normalizeMentors(payload);
-
-        if (remoteMentors.length === 0) {
-          throw new Error("Mentors response did not contain a usable list");
-        }
-
-        setMentors(remoteMentors);
+        setMentors(await fetchMentors(controller.signal));
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           return;
@@ -210,7 +67,7 @@ const Mentor = () => {
       }
     };
 
-    void fetchMentors();
+    void loadMentors();
 
     return () => controller.abort();
   }, []);
