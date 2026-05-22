@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import MentorList from "./MentorList";
-import { mentors } from "./mentorData";
+import type { MentorItem } from "../../data/mentorData";
 import Pagination from "../pagination/Pagination";
 import NavBar from "../navbar/NavBar";
 import Footer from "../footer/Footer";
@@ -36,11 +36,184 @@ const departmentIcons: Record<string, IconType> = {
   "Software Engineering": FaCode,
 };
 
+const mentorsEndpoint =
+  "https://src2026backendmain.vercel.app/mentor";
+
+type MentorApiRecord = Record<string, unknown>;
+
+const readString = (
+  record: MentorApiRecord,
+  fields: string[],
+  fallback?: string
+): string => {
+  for (const field of fields) {
+    const value = record[field];
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+
+  return fallback ?? "";
+};
+
+const readLinks = (record: MentorApiRecord): NonNullable<MentorItem["links"]> => {
+  const links =
+    record.links && typeof record.links === "object"
+      ? (record.links as MentorApiRecord)
+      : {};
+
+  return {
+    website: readString(record, ["website", "websiteUrl", "profileUrl"]) ||
+      readString(record, ["Personal Website"]) ||
+      readString(links, ["website", "websiteUrl", "profileUrl"]),
+    orcid:
+      readString(record, ["orcid", "orcidUrl"]) ||
+      readString(record, ["OrCID"]) ||
+      readString(links, ["orcid", "orcidUrl"]),
+    researchgate:
+      readString(record, ["researchgate", "researchGate", "researchGateUrl"]) ||
+      readString(record, ["ResearchGate"]) ||
+      readString(links, ["researchgate", "researchGate", "researchGateUrl"]),
+    googleScholar:
+      readString(record, [
+        "googleScholar",
+        "google_scholar",
+        "googleScholarUrl",
+      ]) ||
+      readString(record, ["Google Scholar"]) ||
+      readString(links, [
+        "googleScholar",
+        "google_scholar",
+        "googleScholarUrl",
+      ]),
+  };
+};
+
+const getMentorRecords = (payload: unknown): unknown[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && typeof payload === "object") {
+    const record = payload as MentorApiRecord;
+    const wrappedList =
+      record.mentors ?? record.data ?? record.items ?? record.results;
+
+    if (Array.isArray(wrappedList)) {
+      return wrappedList;
+    }
+  }
+
+  return [];
+};
+
+const normalizeMentors = (payload: unknown): MentorItem[] =>
+  getMentorRecords(payload)
+    .map<MentorItem | null>((item) => {
+      if (!item || typeof item !== "object") {
+        return null;
+      }
+
+      const record = item as MentorApiRecord;
+      const department = readString(record, [
+        "department",
+        "field",
+        "major",
+        "faculty",
+        "Department (Đơn vị công tác)",
+      ]);
+      const title = readString(record, [
+        "title",
+        "degree",
+        "position",
+        "Title (Học hàm/học vị)",
+      ]);
+      const role =
+        readString(record, ["role"]) ||
+        [title, department].filter(Boolean).join(" | ") ||
+        "Mentor";
+      const links = readLinks(record);
+      const hasLinks = Object.values(links).some(Boolean);
+      const researchAreas = readString(record, [
+        "researchArea",
+        "researchAreas",
+        "expertise",
+        "Research Areas (Lĩnh vực nghiên cứu chính)",
+      ]);
+      const researchTopics = readString(record, [
+        "researchTopic",
+        "researchTopics",
+        "Research Topics (Hướng nghiên cứu cụ thể)",
+      ]);
+      const image = readString(
+        record,
+        ["image", "imageUrl", "photo", "photoUrl", "avatar", "avatarUrl"]
+      );
+
+      return {
+        name: readString(
+          record,
+          ["name", "fullName", "fullname", "Full Name (Họ và tên)"]
+        ),
+        role,
+        description:
+          readString(record, ["description", "bio"]) ||
+          [researchAreas, researchTopics].filter(Boolean).join(". "),
+        ...(image ? { image } : {}),
+        ...(hasLinks ? { links } : {}),
+      };
+    })
+    .filter((mentor): mentor is MentorItem => Boolean(mentor?.name));
+
 const Mentor = () => {
+  const [mentors, setMentors] = useState<MentorItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeDepartment, setActiveDepartment] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
   const pageSize = 10;
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchMentors = async () => {
+      try {
+        setIsLoading(true);
+        setFetchError("");
+
+        const response = await fetch(mentorsEndpoint, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Mentors request failed with ${response.status}`);
+        }
+
+        const payload = await response.json();
+        const remoteMentors = normalizeMentors(payload);
+
+        if (remoteMentors.length === 0) {
+          throw new Error("Mentors response did not contain a usable list");
+        }
+
+        setMentors(remoteMentors);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setMentors([]);
+        setFetchError("Unable to load live mentor data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchMentors();
+
+    return () => controller.abort();
+  }, []);
 
   const departments = useMemo(() => {
     const uniqueDepartments = new Set(
@@ -48,7 +221,7 @@ const Mentor = () => {
     );
 
     return ["All", ...Array.from(uniqueDepartments).sort()];
-  }, []);
+  }, [mentors]);
 
   const filteredMentors = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -65,7 +238,7 @@ const Mentor = () => {
 
       return matchesDepartment && matchesSearch;
     });
-  }, [activeDepartment, searchTerm]);
+  }, [activeDepartment, mentors, searchTerm]);
 
   // Reset to page 1 when filters or search change
   useEffect(() => {
@@ -93,6 +266,11 @@ const Mentor = () => {
             supporting research, creativity, and presentation quality across
             every field in the competition.
           </p>
+          {(isLoading || fetchError) && (
+            <p className="mt-4 text-sm text-amber-50/55">
+              {isLoading ? "Loading live mentor data..." : fetchError}
+            </p>
+          )}
         </div>
 
         <div className="mb-8 space-y-4 text-amber-50">
@@ -129,9 +307,9 @@ const Mentor = () => {
           departmentIcons={departmentIcons}
         />
 
-        {filteredMentors.length === 0 && (
+        {!isLoading && filteredMentors.length === 0 && (
           <div className="mt-8 rounded-2xl border border-amber-50/20 bg-zinc-900 p-6 text-center text-amber-50/70">
-            No mentors matched your search or filter.
+            {fetchError || "No mentors matched your search or filter."}
           </div>
         )}
 

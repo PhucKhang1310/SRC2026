@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { FaGlobe, FaGraduationCap, FaFlask } from "react-icons/fa6";
 import { SiGooglescholar, SiOrcid, SiResearchgate } from "react-icons/si";
-import type { MentorItem } from "./mentorData";
+import type { MentorItem } from "../../data/mentorData";
 import type { IconType } from "react-icons";
 
 interface MentorListProps {
@@ -16,6 +17,26 @@ const MentorList = ({
   onSearchChange,
   departmentIcons,
 }: MentorListProps) => {
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>(
+    {}
+  );
+
+  const getInitials = (name: string) =>
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(-2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+
+  const toggleExpanded = (cardId: string) => {
+    setExpandedCards((current) => ({
+      ...current,
+      [cardId]: !current[cardId],
+    }));
+  };
+
   return (
     <div className="space-y-6">
       {/* Search bar */}
@@ -46,48 +67,76 @@ const MentorList = ({
 
       {/* 2-column grid of mentor cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {mentors.map((mentor, index) => (
-          <div
-            key={`${mentor.name}-${index}`}
-            className="group rounded-xl border border-amber-50/10 bg-zinc-900 p-5 transition-all duration-300 hover:border-amber-400/30 hover:shadow-lg hover:shadow-amber-400/5"
-          >
+        {mentors.map((mentor, index) => {
+          const cardId = `${mentor.name}-${index}`;
+          const isExpanded = expandedCards[cardId] ?? false;
+          const canExpand = mentor.description.length > 180;
+          const links = mentor.links;
+
+          return (
+            <div
+              key={cardId}
+              className={`group flex flex-col rounded-xl border border-amber-50/10 bg-zinc-900 p-5 transition-all duration-300 hover:border-amber-400/30 hover:shadow-lg hover:shadow-amber-400/5 ${
+                isExpanded ? "min-h-60" : "h-60"
+              }`}
+            >
             {/* Top section: photo + name + role */}
-            <div className="flex items-start gap-4">
-              <img
-                className="size-14 rounded-lg object-cover ring-2 ring-amber-400/20"
-                src={mentor.image}
-                alt={mentor.name}
-                loading="lazy"
-              />
-              <div className="min-w-0 flex-1">
-                <h3 className="text-base font-bold uppercase tracking-wide text-amber-50">
+            <div className="flex h-16 shrink-0 items-start gap-4 overflow-hidden">
+              {mentor.image ? (
+                <img
+                  className="size-14 rounded-lg object-cover ring-2 ring-amber-400/20"
+                  src={mentor.image}
+                  alt={mentor.name}
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-amber-400/15 text-sm font-bold text-amber-200 ring-2 ring-amber-400/20">
+                  {getInitials(mentor.name)}
+                </div>
+              )}
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <h3 className="line-clamp-1 text-base font-bold uppercase tracking-wide text-amber-50 [overflow-wrap:anywhere]">
                   {mentor.name}
                 </h3>
-                <div className="mt-1 flex items-center gap-1.5 text-sm text-amber-400/80">
+                <div className="mt-1 flex items-start gap-1.5 overflow-hidden text-sm text-amber-400/80">
                   {(() => {
                     const dept = mentor.role.split("|")[1]?.trim() ?? "";
                     const DeptIcon = departmentIcons?.[dept] ?? FaGraduationCap;
-                    return <DeptIcon className="size-3.5 shrink-0" />;
+                    return <DeptIcon className="mt-0.5 size-3.5 shrink-0" />;
                   })()}
-                  <span>{mentor.role}</span>
+                  <span className="line-clamp-2 [overflow-wrap:anywhere]">
+                    {mentor.role}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Description with research icon */}
-            <div className="mt-4 flex gap-2.5 border-l-2 border-amber-400/30 pl-3">
+            <div
+              className={`mt-4 mb-4 flex min-h-0 border-l-2 border-amber-400/30 pl-3 ${
+                isExpanded
+                  ? "flex-none overflow-visible"
+                  : "flex-1 overflow-hidden"
+              }`}
+            >
               <FaFlask className="mt-0.5 size-3.5 shrink-0 text-amber-400/60" />
-              <p className="text-sm leading-relaxed text-amber-50/70">
+              <p
+                className={`ml-2.5 text-sm leading-relaxed text-amber-50/70 [overflow-wrap:anywhere] ${
+                  isExpanded
+                    ? "overflow-visible"
+                    : "overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:4]"
+                }`}
+              >
                 {mentor.description}
               </p>
             </div>
 
             {/* Links row */}
-            {mentor.links && (
-              <div className="mt-4 flex items-center gap-1 border-t border-amber-50/5 pt-3">
-                {mentor.links.website && (
+            {(canExpand || links) && (
+              <div className="mt-auto flex shrink-0 items-center gap-1 border-t border-amber-50/5 pt-3">
+                {links?.website && (
                   <a
-                    href={mentor.links.website}
+                    href={links.website}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
@@ -96,9 +145,9 @@ const MentorList = ({
                     <FaGlobe className="size-3.5" />
                   </a>
                 )}
-                {mentor.links.orcid && (
+                {links?.orcid && (
                   <a
-                    href={mentor.links.orcid}
+                    href={links.orcid}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
@@ -107,9 +156,9 @@ const MentorList = ({
                     <SiOrcid className="size-3.5" />
                   </a>
                 )}
-                {mentor.links.researchgate && (
+                {links?.researchgate && (
                   <a
-                    href={mentor.links.researchgate}
+                    href={links.researchgate}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
@@ -118,9 +167,9 @@ const MentorList = ({
                     <SiResearchgate className="size-3.5" />
                   </a>
                 )}
-                {mentor.links.googleScholar && (
+                {links?.googleScholar && (
                   <a
-                    href={mentor.links.googleScholar}
+                    href={links.googleScholar}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
@@ -129,10 +178,21 @@ const MentorList = ({
                     <SiGooglescholar className="size-3.5" />
                   </a>
                 )}
+                {canExpand && (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-xs ml-auto rounded-lg px-0 text-amber-400/80 hover:text-amber-200"
+                    aria-expanded={isExpanded}
+                    onClick={() => toggleExpanded(cardId)}
+                  >
+                    {isExpanded ? "Read less" : "Read more"}
+                  </button>
+                )}
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

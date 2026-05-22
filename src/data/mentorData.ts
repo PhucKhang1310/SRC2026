@@ -1,7 +1,7 @@
 export interface MentorItem {
   name: string;
   role: string;
-  image: string;
+  image?: string;
   description: string;
   links?: {
     website?: string;
