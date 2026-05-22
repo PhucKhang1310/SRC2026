@@ -2,7 +2,7 @@ import type { MentorItem } from "../data/mentorData";
 import type { PublicationItem } from "../data/publicationsData";
 
 const API_BASE_URL = "https://src2026backendmain.vercel.app";
-const SUBMIT_API_BASE_URL = "http://localhost:3000";
+const SUBMIT_API_BASE_URL = "http://src2026backendmain.vercel:3000";
 
 export const API_ENDPOINTS = {
   mentors: `${API_BASE_URL}/mentor`,
@@ -55,7 +55,7 @@ const getPublicationImage = (record: ApiRecord, id: string) => {
   if (Array.isArray(images)) {
     const firstImage = images.find(
       (image): image is ApiRecord =>
-        Boolean(image) && typeof image === "object"
+        Boolean(image) && typeof image === "object",
     );
 
     if (firstImage) {
@@ -67,11 +67,12 @@ const getPublicationImage = (record: ApiRecord, id: string) => {
   }
 
   const contentImage = readString(record, ["content"]).match(
-    /<img[^>]+src=["']([^"']+)["']/i
+    /<img[^>]+src=["']([^"']+)["']/i,
   )?.[1];
 
   return (
-    contentImage ?? `https://picsum.photos/seed/resfes-publication-${id}/800/600`
+    contentImage ??
+    `https://picsum.photos/seed/resfes-publication-${id}/800/600`
   );
 };
 
@@ -104,7 +105,7 @@ const normalizePublications = (payload: unknown): PublicationItem[] =>
       };
     })
     .filter((publication): publication is PublicationItem =>
-      Boolean(publication?.title)
+      Boolean(publication?.title),
     );
 
 export const fetchPublications = async (signal?: AbortSignal) => {
@@ -119,11 +120,11 @@ export const fetchPublications = async (signal?: AbortSignal) => {
 
 export const fetchPublicationById = async (
   id: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ) => {
   const publications = await fetchPublications(signal);
   const publication = publications.find(
-    (item) => String(item.id) === decodeURIComponent(id)
+    (item) => String(item.id) === decodeURIComponent(id),
   );
 
   if (!publication) {
@@ -133,7 +134,9 @@ export const fetchPublicationById = async (
   return publication;
 };
 
-const readMentorLinks = (record: ApiRecord): NonNullable<MentorItem["links"]> => {
+const readMentorLinks = (
+  record: ApiRecord,
+): NonNullable<MentorItem["links"]> => {
   const links =
     record.links && typeof record.links === "object"
       ? (record.links as ApiRecord)
@@ -268,7 +271,7 @@ export const fetchMentors = async (signal?: AbortSignal) => {
 const submitJson = async <Payload>(
   endpoint: string,
   payload: Payload,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ) => {
   const response = await fetch(endpoint, {
     method: "POST",
@@ -323,12 +326,12 @@ export type PublicationSubmissionPayload = {
 
 export const submitMentor = (
   payload: MentorSubmissionPayload,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ) => submitJson(API_ENDPOINTS.mentorSubmit, payload, signal);
 
 export const submitPublication = (
   payload: PublicationSubmissionPayload,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ) => submitJson(API_ENDPOINTS.publicationSubmit, payload, signal);
 
 export const parsePublicationDate = (date: string) => {
