@@ -4,10 +4,12 @@ import { FaArrowRight } from "react-icons/fa6";
 import { fetchPublications, parsePublicationDate } from "../../api/api";
 import type { PublicationItem } from "../../data/publicationsData";
 import { useCheckMobile } from "../../hook/useCheckMobile";
+import { useEditableContent } from "../../hook/useEditableContent";
 
 const Publications = () => {
   const navigate = useNavigate();
   const { isMobile } = useCheckMobile();
+  const { publicationsHome } = useEditableContent();
   const [latestPubs, setLatestPubs] = useState<PublicationItem[]>([]);
 
   useEffect(() => {
@@ -39,7 +41,7 @@ const Publications = () => {
       {/* Section header */}
       <div className="mb-12 w-4/5 max-w-5xl text-center">
         <p className="divider divider-neutral text-xs font-semibold uppercase tracking-[0.3em] text-black/50">
-          Latest Posts
+          {publicationsHome.eyebrow}
         </p>
       </div>
 
@@ -80,7 +82,7 @@ const Publications = () => {
               }
             >
               <span className="mb-2 text-xs font-bold uppercase tracking-widest text-teal-600">
-                Latest
+                {publicationsHome.badge}
               </span>
               <h3 className="mb-3 text-xl font-bold leading-tight text-gray-900 md:text-2xl line-clamp-4">
                 {pub.title}
@@ -103,7 +105,7 @@ const Publications = () => {
                     navigate(`/publications/${encodeURIComponent(pub.id)}`)
                   }
                 >
-                  Keep Reading
+                  {publicationsHome.readMoreLabel}
                   <FaArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
                 </button>
               </div>
@@ -118,7 +120,7 @@ const Publications = () => {
         className="mt-12 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-500 transition-colors hover:text-black cursor-pointer"
         onClick={() => navigate("/publications")}
       >
-        View all publications
+        {publicationsHome.viewAllLabel}
         <FaArrowRight className="size-3.5" />
       </button>
     </section>

@@ -6,9 +6,11 @@ import resfesMentor from "../../assets/resfes_mentor.jpg";
 import { useFadeIn } from "../../hook/useFadeIn";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import { FaChevronDown } from "react-icons/fa6";
+import { useEditableContent } from "../../hook/useEditableContent";
 
 const AboutUs = () => {
   const { isMobile } = useCheckMobile();
+  const { about } = useEditableContent();
   const [showMore, setShowMore] = useState(isMobile ? false : true);
   const images = [resfesPlasma, resfesTour, resfesWind, resfesMentor];
 
@@ -67,35 +69,25 @@ const AboutUs = () => {
           </div>
           <div className="flex flex-1 flex-col gap-4 pl-8">
             <h3 className="text-3xl font-bold leading-tight text-black">
-              Research-Based Learning, Real-World Impact
+              {about.title}
             </h3>
             <p className="text-base leading-8 text-black/75">
               <span className="font-semibold text-black">
-                Research-Based Learning (RBL)
+                {about.highlightOne}
               </span>{" "}
-              places students at the center of educational activity, shifting
-              the focus from teacher-centered delivery to student-driven
-              inquiry. Through active research practice, students strengthen
-              core skills in problem definition, data collection, analysis, and
-              evidence-based explanation.
+              {about.paragraphOne}
             </p>
             {!showMore ? (
               <div className="">
                 <p className="text-base leading-8 text-black/75">
                   At{" "}
                   <span className="font-semibold text-black">
-                    Student Research Competition 2026
+                    {about.highlightTwo}
                   </span>
-                  , students are encouraged to move from passive learners to
-                  active participants in the scientific journey. SRC 2026
-                  integrates RBL into major-specific curricula to cultivate
-                  practical, relevant capabilities for each field.
+                  , {about.paragraphTwo}
                 </p>
                 <p className="text-base leading-8 text-black/75">
-                  We encourage research teams across majors and sub-committees
-                  to apply research-based learning in authentic contexts,
-                  equipping students with the mindset and skills needed to meet
-                  evolving industry demands.
+                  {about.paragraphThree}
                 </p>
               </div>
             ) : (
@@ -145,33 +137,23 @@ const AboutUs = () => {
         </div>
         <div className="flex flex-1 flex-col gap-4 pl-8">
           <h3 className="text-3xl font-bold leading-tight text-black">
-            Research-Based Learning, Real-World Impact
+            {about.title}
           </h3>
           <p className="text-base leading-8 text-black/75">
             <span className="font-semibold text-black">
-              Research-Based Learning (RBL)
+              {about.highlightOne}
             </span>{" "}
-            places students at the center of educational activity, shifting the
-            focus from teacher-centered delivery to student-driven inquiry.
-            Through active research practice, students strengthen core skills in
-            problem definition, data collection, analysis, and evidence-based
-            explanation.
+            {about.paragraphOne}
           </p>
           <p className="text-base leading-8 text-black/75">
             At{" "}
             <span className="font-semibold text-black">
-              Student Research Competition 2026
+              {about.highlightTwo}
             </span>
-            , students are encouraged to move from passive learners to active
-            participants in the scientific journey. SRC 2026 integrates RBL into
-            major-specific curricula to cultivate practical, relevant
-            capabilities for each field.
+            , {about.paragraphTwo}
           </p>
           <p className="text-base leading-8 text-black/75">
-            We encourage research teams across majors and sub-committees to
-            apply research-based learning in authentic contexts, equipping
-            students with the mindset and skills needed to meet evolving
-            industry demands.
+            {about.paragraphThree}
           </p>
         </div>
       </div>
@@ -196,7 +178,7 @@ const AboutUs = () => {
             fill="#00000"
           />
         </svg>
-        ABOUT SRC 2026
+        {about.sectionLabel}
       </span>
 
       {renderCarousel()}

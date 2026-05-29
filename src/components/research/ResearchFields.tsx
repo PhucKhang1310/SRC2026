@@ -4,9 +4,11 @@ import ResearchAccordion from "./ResearchAccordion";
 import ResearchCarousel from "./ResearchCarousel";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import ResearchFieldsMobile from "./ResearchFieldMobile";
+import { useEditableContent } from "../../hook/useEditableContent";
 
 const ResearchFields = () => {
   const { isMobile } = useCheckMobile();
+  const { researchTitle, researchFields } = useEditableContent();
   const [activeField, setActiveField] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const { inView, ref } = useFadeIn();
@@ -41,6 +43,8 @@ const ResearchFields = () => {
       <ResearchFieldsMobile
         activeField={activeField}
         onAccordionChange={handleAccordionChange}
+        fields={researchFields}
+        title={researchTitle}
       />
     )
   }
@@ -63,17 +67,19 @@ const ResearchFields = () => {
             fill="#000000"
           />
         </svg>
-        RESEARCH FIELDS
+        {researchTitle}
       </span>
       <div className="flex gap-10 mt-10 items-center w-2/3">
         <ResearchAccordion
           activeField={activeField}
           onAccordionChange={handleAccordionChange}
+          fields={researchFields}
         />
         <div className="divider divider-horizontal divider-neutral " />
         <ResearchCarousel
           carouselRef={carouselRef}
           onScroll={handleCarouselScroll}
+          fields={researchFields}
         />
       </div>
     </div>

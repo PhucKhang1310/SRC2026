@@ -1,33 +1,4 @@
-type Milestone = {
-  id: number;
-  date: string;
-  title: string;
-  detail?: string;
-};
-
-const milestones: Milestone[] = [
-  {
-    id: 1,
-    date: "26.01.2026 - 20.02.2026",
-    title: "Competition registration period",
-    detail: "START",
-  },
-  {
-    id: 2,
-    date: "01.03.2026",
-    title: "Workshop: Scientific research methodology",
-  },
-  {
-    id: 3,
-    date: "10.03.2026 - 05.04.2026",
-    title: "Full research paper submission",
-  },
-  {
-    id: 4,
-    date: "19.04.2026",
-    title: "Final Round",
-  },
-];
+import { useEditableContent } from "../../hook/useEditableContent";
 
 const CheckIcon = () => (
   <svg
@@ -45,6 +16,8 @@ const CheckIcon = () => (
 );
 
 const Milestones = () => {
+  const { milestones, milestonesNote, milestonesTitle } = useEditableContent();
+
   return (
     <>
       <style>
@@ -81,7 +54,7 @@ const Milestones = () => {
               fill="#ffffff"
             />
           </svg>
-          MILESTONES
+          {milestonesTitle}
         </span>
         <div className="mx-auto max-w-5xl px-2 py-4 sm:px-4">
           <ul className="timeline timeline-snap-icon timeline-vertical w-full">
@@ -137,8 +110,7 @@ const Milestones = () => {
           </ul>
 
           <p className="mt-8 text-center text-sm italic font-thin opacity-40">
-            All dates are announced according to the official SRC 2026 schedule
-            from FPT University HCMC.
+            {milestonesNote}
           </p>
         </div>
       </section>

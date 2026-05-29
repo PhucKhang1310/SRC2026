@@ -1,8 +1,15 @@
 import workshopImage from "../../assets/resfes_tour.jpg";
 import { useCheckMobile } from "../../hook/useCheckMobile";
+import { useEditableContent } from "../../hook/useEditableContent";
 
 const Workshops = () => {
   const { isMobile } = useCheckMobile();
+  const { workshops } = useEditableContent();
+  const workshop = workshops[0];
+
+  if (!workshop) {
+    return null;
+  }
 
   return (
     <section id="workshops" className="scroll-mt-24 px-6 py-20 lg:px-10 ">
@@ -16,29 +23,29 @@ const Workshops = () => {
       >
         <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col items-center px-6 py-16 text-center lg:px-10">
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.35em] text-orange-400/90">
-            Workshops
+            {workshop.eyebrow}
           </p>
           <h2 className="text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
-            Scientific Research Guidance Workshops
+            {workshop.title}
           </h2>
           <p className="mt-4 text-sm text-white/60 max-w-xl">
-            Hướng dẫn thông tin chương trình và phổ biến. Nếu sinh viên có thắc mắc có thể đến Phòng Lab để được FARPC hỗ trợ.
+            {workshop.description}
           </p>
 
           <ul className="list mt-8 w-full rounded-2xl bg-black/50 backdrop-blur-sm border border-white/15 text-start">
             <li className="p-4 pb-2 text-xs opacity-60 tracking-wide text-white">
-              Upcoming workshop — Thursday, 22.05.2026
-              <span className="ml-2 text-orange-300 italic">(Date may change after Preliminary Round)</span>
+              {workshop.scheduleLabel} - {workshop.date}
+              <span className="ml-2 text-orange-300 italic">({workshop.note})</span>
             </li>
 
             <li className={`list-row border-white/10 ${isMobile ? "flex flex-col" : ""}`} >
               <div>
-                <div className="text-white font-semibold">Scientific Research Guidance Workshop</div>
-                <div className="text-xs uppercase font-semibold opacity-60 text-white/70">Competition Rules, Submission Guidelines & More</div>
+                <div className="text-white font-semibold">{workshop.sessionTitle}</div>
+                <div className="text-xs uppercase font-semibold opacity-60 text-white/70">{workshop.sessionSubtitle}</div>
               </div>
               <div className={`flex flex-col items-end text-xs text-white/60 ${isMobile ? 'items-start' : ''}`}>
-                <span>22.05.2026</span>
-                <span className="text-orange-300">TBA</span>
+                <span>{workshop.date}</span>
+                <span className="text-orange-300">{workshop.time}</span>
               </div>
             </li>
           </ul>
