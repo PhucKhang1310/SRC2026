@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import fptLogo from "../../assets/fpt_logo.jpg"
-import { newsData, type NewsItem } from "../../data/newsData";
+import type { NewsItem } from "../../data/newsData";
 import NavBar from "../navbar/NavBar";
 import Pagination from "../pagination/Pagination";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../footer/Footer";
 import { useCheckMobile } from "../../hook/useCheckMobile";
-
-const newsList: NewsItem[] = [...newsData, ...newsData, ...newsData];
+import { useEditableContent } from "../../hook/useEditableContent";
 
 const NewsList = () => {
     let pageSize = 9;
+    const { news } = useEditableContent();
+    const newsList: NewsItem[] = useMemo(() => [...news, ...news, ...news], [news]);
     const [newsItems, setNewsItems] = useState<NewsItem[]>(newsList.slice(0, pageSize));
     const [currentPage, setCurrentPage] = useState(1);
     const navigate = useNavigate();
@@ -31,7 +32,7 @@ const NewsList = () => {
         handlePageChange();
 
         return () => handlePageChange();
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, newsList]);
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -61,7 +62,7 @@ const NewsList = () => {
                     SRC2026 News
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-16 p-6">
-                    {newsItems.map((newsItem, index) => (
+                    {newsItems.length > 0 ? newsItems.map((newsItem, index) => (
                         <a
                             key={`news-item-${index}-${newsItem.id}`}
                             href={`/news-list/${newsItem.id}`}
@@ -82,7 +83,9 @@ const NewsList = () => {
                                 <h3 className="line-clamp-2 font-semibold text-base text-[#f27255]">{newsItem.title}</h3>
                             </div>
                         </a>
-                    ))}
+                    )) : (
+                        <p className="col-span-full py-12 text-center text-white/70">No news items are available.</p>
+                    )}
                 </div>
 
                 <Pagination

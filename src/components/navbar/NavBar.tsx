@@ -85,9 +85,6 @@ const NavBar = () => {
                     <a href="/publications">Publications</a>
                   </li>
                   <li>
-                    <a href="/home#awards">History</a>
-                  </li>
-                  <li>
                     <a href="/mentors">Mentors</a>
                   </li>
                   <li>

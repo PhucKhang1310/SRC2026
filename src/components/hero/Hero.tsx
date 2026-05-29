@@ -6,13 +6,14 @@ import logoFptu from '../../assets/logo-fptu.png'
 // import resfes2025 from '../../assets/2025-RES FES-VUÔNG-WHITE.png'
 import resfes2026 from '../../assets/logo_src_white_nobg.png'
 import fptLogoFixed from "../../assets/fpt_logo-removebg-preview_cropped.png";
+import { useEditableContent } from "../../hook/useEditableContent";
 
 
 const Hero = () => {
   const { isMobile } = useCheckMobile()
+  const { hero } = useEditableContent();
 
-  // Countdown to registration deadline: 01.06.2026
-  const targetDate = new Date("2026-06-01T23:59:59+07:00").getTime();
+  const targetDate = new Date(hero.registrationDeadline).getTime();
 
   const calculateTimeLeft = () => {
     const now = Date.now();
@@ -73,23 +74,26 @@ const Hero = () => {
             <div className="hero-content self-start p-0 text-neutral-content lg:justify-start">
               <div className="max-w-xl">
                 <div className="mb-3 text-5xl lg:text-7xl text-white">
-                  <h1 className="font-bold ">{renderFlickerText("STUDENT")}</h1>
-                  <h1 className="font-thin">{renderFlickerText("RESEARCH")}</h1>
-                  <h1 className="font-bold">{renderFlickerText("COMPETITION")}</h1>
-                  <h1 className="font-thin">{renderFlickerText("2026")}</h1>
+                  {hero.titleLines.map((line, index) => (
+                    <h1
+                      key={`${line}-${index}`}
+                      className={index % 2 === 0 ? "font-bold" : "font-thin"}
+                    >
+                      {renderFlickerText(line)}
+                    </h1>
+                  ))}
                 </div>
                 <div className="text-rotate mb-3 font-semibold text-orange-400">
                   <span className="justify-items-start">
                     <span className="max-w-lg">
-                      RBL in Action, Researchers Ready
+                      {hero.taglinePrimary}
                     </span>
                     <span className="max-w-lg">
-                      Triển khai RBL,
-                      Triển vọng trong nghiên cứu
+                      {hero.taglineSecondary}
                     </span>
                   </span>
                 </div>
-                <p className="text-xs text-white/50 mb-2 tracking-wide">Registration closes 01.06.2026</p>
+                <p className="text-xs text-white/50 mb-2 tracking-wide">{hero.countdownLabel}</p>
                 <div className={`grid grid-flow-col gap-2 text-center auto-cols-max lg:gap-5 `}>
                   <div className="flex flex-col p-2 bg-[#111827] rounded-box text-neutral-content">
                     <span className="countdown font-mono text-5xl">
@@ -142,12 +146,12 @@ const Hero = () => {
                 </div>
                 <div className={`flex ${isMobile ? `flex-col max-w-xs` : `gap-5`}`}>
                   <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLScEo6HgWxAHJbjeiE2MoVAMRfM1ltmtt3hTJZ0cza6Pz4F1HQ/viewform"
+                    href="/register"
                     target="_blank"
                     rel="noreferrer"
                     className="btn mt-8 rounded-full border-0 bg-orange-600 px-8 text-white hover:bg-orange-600/90"
                   >
-                    Register Now
+                    {hero.ctaLabel}
                   </a>
                 </div>
               </div>
@@ -177,7 +181,7 @@ const Hero = () => {
                     fill="#ffffff"
                   />
                 </svg>
-                WE ARE
+                {hero.partnerLabel}
               </span>
             )}
             {isMobile ? (
@@ -197,11 +201,9 @@ const Hero = () => {
             )}
             <div className="col-span-6 text-center text-2xl pb-18">
               <h1 className="font-thin text-white ">
-                <span className="font-bold">Empowering minds</span>
-                {isMobile && <br />} to turn
-                research into
+                <span className="font-bold">{hero.closingLinePrimary}</span>
               </h1>
-              <h1 className="font-bold text-white"> progress, innovation, and change</h1>
+              <h1 className="font-bold text-white">{hero.closingLineSecondary}</h1>
             </div>
           </div>
         </div>

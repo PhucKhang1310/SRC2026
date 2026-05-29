@@ -5,64 +5,32 @@ import {
   FaMicrochip,
   FaPalette,
 } from "react-icons/fa6";
+import type { ResearchFieldItem } from "../../data/contentData";
 
 interface ResearchAccordionProps {
   activeField: number;
   onAccordionChange: (index: number) => void;
+  fields: ResearchFieldItem[];
 }
 
 const ResearchAccordion = ({
   activeField,
   onAccordionChange,
+  fields,
 }: ResearchAccordionProps) => {
-  const fields = [
-    {
-      icon: FaLaptopCode,
-      title: "Information Technology",
-      items: [
-        "Software Engineering",
-        "Artificial Intelligence",
-        "Data Science & Analytics",
-        "Information Systems",
-      ],
-    },
-    {
-      icon: FaMicrochip,
-      title: "Semiconductor IC & Digital Automotive",
-      items: [
-        "Semiconductor IC Design",
-        "Digital Automotive Systems",
-        "Embedded Systems",
-      ],
-    },
-    {
-      icon: FaPalette,
-      title: "Graphic Design & Digital Art, Multimedia Communication",
-      items: [
-        "Graphic Design & Digital Art",
-        "Multimedia Communication",
-      ],
-    },
-    {
-      icon: FaChartLine,
-      title: "Economics & Business Administration",
-      items: ["Economics", "Business Administration"],
-    },
-    {
-      icon: FaLanguage,
-      title: "Languages (English & Japanese)",
-      items: [
-        "English Language Studies and research topics",
-        "Japanese Language Studies and research topics",
-      ],
-    },
-  ];
+  const iconMap = {
+    code: FaLaptopCode,
+    chip: FaMicrochip,
+    design: FaPalette,
+    business: FaChartLine,
+    language: FaLanguage,
+  };
 
   return (
     <div className="flex flex-1 justify-center w-3/4 h-full">
       <div className="join join-vertical bg-amber-50 rounded-2xl text-black">
         {fields.map((field, index) => {
-          const IconComponent = field.icon;
+          const IconComponent = iconMap[field.icon] ?? FaLaptopCode;
           const isFirst = index === 0;
           const isLast = index === fields.length - 1;
 
@@ -85,7 +53,7 @@ const ResearchAccordion = ({
               </div>
               <div className="collapse-content font-thin text-black">
                 <ul className="list-disc pl-5 whitespace-normal wrap-break-word">
-                  {field.items.map((item, itemIndex) => (
+                  {field.accordionItems.map((item, itemIndex) => (
                     <li key={itemIndex}>{item}</li>
                   ))}
                 </ul>

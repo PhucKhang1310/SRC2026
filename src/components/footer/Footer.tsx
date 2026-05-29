@@ -4,9 +4,11 @@ import fptLogoFixed from '../../assets/fpt_logo-removebg-preview_cropped.png'
 // import resfes2025 from '../../assets/2025-RES FES-VUÔNG-WHITE.png'
 import resfes2026 from '../../assets/logo_src_white_nobg.png'
 import { useCheckMobile } from "../../hook/useCheckMobile";
+import { useEditableContent } from "../../hook/useEditableContent";
 
 const Footer = () => {
   const { isMobile } = useCheckMobile();
+  const { footer } = useEditableContent();
   return (
     <div
       id="footer"
@@ -39,46 +41,46 @@ const Footer = () => {
 
         <aside className="w-full flex lg:flex-row md:flex-row justify-between">
           <div className=" font-bold text-2xl">
-            Think bigger
-            <p className="font-thin"> Build Smarter</p>
-            <p className="text-4xl mt-3 font-medium">Join SRC</p>
+            {footer.headlineOne}
+            <p className="font-thin"> {footer.headlineTwo}</p>
+            <p className="text-4xl mt-3 font-medium">{footer.headlineThree}</p>
             <br />
             <div className={`flex ${isMobile ? "flex-col max-w-xs" : ""} gap-5`}>
               <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLScEo6HgWxAHJbjeiE2MoVAMRfM1ltmtt3hTJZ0cza6Pz4F1HQ/viewform"
+                href="/register"
                 target="_blank"
                 rel="noreferrer"
                 className="btn mt-2 rounded-full border-0 bg-orange-600 px-8 text-white hover:bg-orange-600/90"
               >
-                Register Now
+                {footer.ctaLabel}
               </a>
             </div>
           </div>
           <nav className={`${isMobile ? "" : "justify-self-end"}`}>
-            {!isMobile && <p className="font-bold text-2xl mb-3">Contact us</p>}
+            {!isMobile && <p className="font-bold text-2xl mb-3">{footer.contactHeading}</p>}
             <div className="flex sm:flex-col gap-5 mt-2">
               <a
-                href="https://www.facebook.com/fpt.resfes"
+                href={footer.facebookUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-3 transition hover:text-orange-500"
               >
                 <FaFacebookF className="text-lg" />
-                {!isMobile && <span>Follow us on Facebook</span>}
+                {!isMobile && <span>{footer.facebookLabel}</span>}
               </a>
               <a
-                href="mailto:src@fe.edu.vn"
+                href={`mailto:${footer.email}`}
                 className="flex items-center gap-3 transition hover:text-orange-500"
               >
                 <FaEnvelope className="text-lg" />
-                {!isMobile && <span>Email us at src@fe.edu.vn</span>}
+                {!isMobile && <span>{footer.emailLabel}</span>}
               </a>
               <a
-                href="tel:+842465549806"
+                href={`tel:${footer.phone}`}
                 className="flex items-center gap-3 transition hover:text-orange-500"
               >
                 <FaPhone className="text-lg" />
-                {!isMobile && <span>(+84) 246.654.9806</span>}
+                {!isMobile && <span>{footer.phoneLabel}</span>}
               </a>
             </div>
           </nav>
@@ -88,9 +90,9 @@ const Footer = () => {
         <div className="divider w-2/3" />
       </div>
       <p className="font-thin opacity-40 text-sm pb-1">
-        © 2026 Student Research Competition
+        {footer.copyrightLine}
       </p>
-      <p className="font-thin opacity-40 text-sm pb-20">All rights reserved</p>
+      <p className="font-thin opacity-40 text-sm pb-20">{footer.rightsLine}</p>
     </div>
   );
 };

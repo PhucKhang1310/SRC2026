@@ -1,18 +1,19 @@
 import { Link, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
-import { newsData } from "../../data/newsData";
 import Navbar from "../navbar/NavBar";
 import fptLogo from "../../assets/fpt_logo.jpg";
 import Footer from "../footer/Footer";
 import { useCheckMobile } from "../../hook/useCheckMobile";
+import { useEditableContent } from "../../hook/useEditableContent";
 
 const NewsDetail = () => {
     const { isMobile } = useCheckMobile();
+    const { news } = useEditableContent();
 
     const { id } = useParams<{ id: string }>();
 
-    const newsItem = newsData.find(item => item.id === Number(id));
-    const filteredNewsData = newsData.filter(item => item.id !== Number(id));
+    const newsItem = news.find(item => item.id === Number(id));
+    const filteredNewsData = news.filter(item => item.id !== Number(id));
 
     const handleBack = () => {
         window.history.back();
@@ -77,7 +78,7 @@ const NewsDetail = () => {
                             .map((item) => (
                                 <Link
                                     key={item.id}
-                                    to={`/news/${item.id}`}
+                                    to={`/news-list/${item.id}`}
                                     className={
                                         isMobile
                                             ? "col-span-12"

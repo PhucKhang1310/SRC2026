@@ -1,14 +1,19 @@
 import { useInView } from "react-intersection-observer";
 import ResearchAccordion from "./ResearchAccordion";
+import type { ResearchFieldItem } from "../../data/contentData";
 
 interface ResearchFieldsMobileProps {
   activeField: number;
   onAccordionChange: (index: number) => void;
+  fields: ResearchFieldItem[];
+  title: string;
 }
 
 const ResearchFieldsMobile = ({
   activeField,
   onAccordionChange,
+  fields,
+  title,
 }: ResearchFieldsMobileProps) => {
   const { ref, inView } = useInView();
 
@@ -30,12 +35,13 @@ const ResearchFieldsMobile = ({
             fill="#000000"
           />
         </svg>
-        RESEARCH FIELDS
+        {title}
       </span>
       <>
         <ResearchAccordion
           activeField={activeField}
           onAccordionChange={onAccordionChange}
+          fields={fields}
         />
       </>
     </div>
