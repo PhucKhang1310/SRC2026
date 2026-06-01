@@ -90,6 +90,9 @@ const NavBar = () => {
                   <li>
                     <a href="/submit">Submit</a>
                   </li>
+                  <li>
+                    <a href="/auth/login">Login</a>
+                  </li>
                 </ul>
               </div>
             </div>
