@@ -1,14 +1,17 @@
 import type { MentorItem } from "../data/mentorData";
 import type { PublicationItem } from "../data/publicationsData";
 
-const API_BASE_URL = "https://src2026backendmain.vercel.app";
-const SUBMIT_API_BASE_URL = "http://src2026backendmain.vercel:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "") ??
+  "https://src2026backendmain.vercel.app";
 
 export const API_ENDPOINTS = {
   mentors: `${API_BASE_URL}/mentor`,
-  mentorSubmit: `${SUBMIT_API_BASE_URL}/mentor/submit`,
+  mentorSubmit: `${API_BASE_URL}/mentor/submit`,
   publications: `${API_BASE_URL}/publication`,
-  publicationSubmit: `${SUBMIT_API_BASE_URL}/publication/submit`,
+  publicationSubmit: `${API_BASE_URL}/publication/submit`,
+  signup: `${API_BASE_URL}/auth/signup`,
+  login: `${API_BASE_URL}/auth/login`,
 } as const;
 
 type ApiRecord = Record<string, unknown>;
@@ -322,6 +325,69 @@ export type PublicationSubmissionPayload = {
     url: string;
     publicId: string;
   }[];
+};
+
+const readErrorMessage = async (response: Response, fallback: string) => {
+  const contentType = response.headers.get("content-type");
+
+  if (contentType?.includes("application/json")) {
+    const payload = (await response.json()) as ApiRecord;
+    return readString(payload, ["message"], fallback);
+  }
+
+  return fallback;
+};
+
+export const callEmailSignup = async (
+  email: string,
+  password: string,
+  signal?: AbortSignal,
+) => {
+  const response = await fetch(API_ENDPOINTS.signup, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await readErrorMessage(
+        response,
+        `Email signup failed with ${response.status}`,
+      ),
+    );
+  }
+
+  return response.json() as Promise<{ message: string }>;
+};
+
+export const login = async (
+  email: string,
+  password: string,
+  signal?: AbortSignal,
+) => {
+  const response = await fetch(API_ENDPOINTS.login, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await readErrorMessage(
+        response,
+        `Login failed with ${response.status}`,
+      ),
+    );
+  }
+
+  return response.json() as Promise<{ token: string }>;
 };
 
 export const submitMentor = (

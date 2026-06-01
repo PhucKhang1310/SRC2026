@@ -21,6 +21,8 @@ import {
 } from "../../data/contentData";
 import type { NewsItem } from "../../data/newsData";
 import { useEditableContent } from "../../hook/useEditableContent";
+import { useUser } from "../../hook/useUser";
+import { Navigate } from "react-router-dom";
 
 type SectionKey = keyof EditableContent;
 type ArraySectionKey =
@@ -55,9 +57,14 @@ const awardsToText = (items: { label: string; amount: string }[]) =>
   items.map((award) => `${award.label} | ${award.amount}`).join("\n");
 
 const AdminPage = () => {
+  const { user } = useUser();
   const storedContent = useEditableContent();
   const [content, setContent] = useState<EditableContent>(storedContent);
   const [editingKey, setEditingKey] = useState<EditingKey | null>(null);
+
+  if (!user) {
+    return <Navigate to="/auth/login" replace />;
+  }
 
   const updateContent = (nextContent: EditableContent) => {
     setContent(nextContent);
@@ -109,12 +116,12 @@ const AdminPage = () => {
       researchFields: content.researchFields.map((item) =>
         item.id === id
           ? {
-              ...item,
-              [field]:
-                field === "accordionItems" || field === "carouselItems"
-                  ? textToList(value)
-                  : value,
-            }
+            ...item,
+            [field]:
+              field === "accordionItems" || field === "carouselItems"
+                ? textToList(value)
+                : value,
+          }
           : item,
       ),
     });
@@ -130,9 +137,9 @@ const AdminPage = () => {
       regulations: content.regulations.map((item) =>
         item.id === id
           ? {
-              ...item,
-              [field]: field === "items" ? textToList(value) : value,
-            }
+            ...item,
+            [field]: field === "items" ? textToList(value) : value,
+          }
           : item,
       ),
     });
@@ -595,9 +602,9 @@ const AdminPage = () => {
                         awards: content.awards.map((award) =>
                           award.id === item.id
                             ? {
-                                ...award,
-                                expandedNote: value || undefined,
-                              }
+                              ...award,
+                              expandedNote: value || undefined,
+                            }
                             : award,
                         ),
                       })

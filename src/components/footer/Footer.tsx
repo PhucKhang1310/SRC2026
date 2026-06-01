@@ -19,7 +19,7 @@ const Footer = () => {
           {/* Optional fading edges */}
           <div className="absolute inset-y-0 left-0 w-8 lg:w-20 bg-gradient-to-r from-neutral to-transparent z-10"></div>
           <div className="absolute inset-y-0 right-0 w-8 lg:w-20 bg-gradient-to-l from-neutral to-transparent z-10"></div>
-          
+
           <div className="flex w-max animate-marquee">
             {/* Set 1 */}
             <div className="flex min-w-[100vw] md:min-w-[80vw] lg:min-w-[1280px] shrink-0 items-center justify-around px-4">
