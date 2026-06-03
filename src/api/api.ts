@@ -6,12 +6,12 @@ const API_BASE_URL =
   "https://src2026backendmain.vercel.app";
 
 export const API_ENDPOINTS = {
-  mentors: `${API_BASE_URL}/mentor`,
-  mentorSubmit: `${API_BASE_URL}/mentor/submit`,
-  publications: `${API_BASE_URL}/publication`,
-  publicationSubmit: `${API_BASE_URL}/publication/submit`,
-  signup: `${API_BASE_URL}/auth/signup`,
-  login: `${API_BASE_URL}/auth/login`,
+  mentors: `${API_BASE_URL}/api/v1/mentor`,
+  mentorSubmit: `${API_BASE_URL}/api/v1/mentor/submit`,
+  publications: `${API_BASE_URL}/api/v1/publication`,
+  publicationSubmit: `${API_BASE_URL}/api/v1/publication/submit`,
+  signup: `${API_BASE_URL}/api/v1/auth/signup`,
+  login: `${API_BASE_URL}/api/v1/auth/login`,
 } as const;
 
 type ApiRecord = Record<string, unknown>;
