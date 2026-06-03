@@ -3,8 +3,10 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import MobileMenu from "./MobileMenu";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import fptLogoFixed from "../../assets/fpt_logo-removebg-preview_cropped.png";
+import { useUser } from "../../hook/useUser";
 
 const NavBar = () => {
+  const { user } = useUser()
   const { isMobile } = useCheckMobile();
   const [isHidden, setIsHidden] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -93,6 +95,11 @@ const NavBar = () => {
                   <li>
                     <a href="/auth/login">Login</a>
                   </li>
+                  {user && (
+                    <li>
+                      <a href="/admin">Admin</a>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>

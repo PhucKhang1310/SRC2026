@@ -35,9 +35,10 @@ type ArraySectionKey =
 type EditingKey = `${SectionKey}-${number}`;
 
 const inputClass =
-  "w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20";
+  "w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-amber-50 outline-none transition placeholder:text-amber-50/30 focus:border-[#ff6a1f] focus:ring-2 focus:ring-[#ff6a1f]/20";
 
-const labelClass = "text-xs font-semibold uppercase text-slate-500";
+const labelClass =
+  "text-xs font-semibold uppercase tracking-wider text-amber-50/55";
 
 const createEditingKey = (section: SectionKey, id: number): EditingKey =>
   `${section}-${id}`;
@@ -278,15 +279,17 @@ const AdminPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 px-5 py-8 text-slate-950">
+    <main className="min-h-screen bg-black px-5 py-8 text-amber-50">
       <section className="mx-auto max-w-6xl">
-        <div className="flex flex-col gap-4 border-b border-slate-300 pb-6 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-4 border-b border-amber-50/15 pb-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase text-orange-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#ff6a1f]">
               Admin
             </p>
-            <h1 className="mt-1 text-3xl font-bold">Page Content</h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-600">
+            <h1 className="mt-1 text-3xl font-bold">
+              <a href="/">SRC2026</a>
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm text-amber-50/60">
               Edit the text shown on the public page. Changes are saved in this
               browser for now.
             </p>
@@ -294,7 +297,7 @@ const AdminPage = () => {
           <button
             type="button"
             onClick={handleReset}
-            className="inline-flex items-center justify-center gap-2 rounded bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#ff6a1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#e85f1b]"
           >
             <FaRotateLeft />
             Reset
@@ -302,7 +305,7 @@ const AdminPage = () => {
         </div>
 
         <AdminSection title="Hero">
-          <div className="rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <div className="grid gap-3 md:grid-cols-2">
               <TextArea
                 label="Title lines"
@@ -354,7 +357,7 @@ const AdminPage = () => {
         </AdminSection>
 
         <AdminSection title="About">
-          <div className="rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <div className="grid gap-3 md:grid-cols-2">
               <TextInput
                 label="Section label"
@@ -406,7 +409,7 @@ const AdminPage = () => {
           actionLabel="Add field"
           onAdd={addResearchField}
         >
-          <div className="mb-4 rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="mb-4 rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <TextInput
               label="Section title"
               value={content.researchTitle}
@@ -423,7 +426,7 @@ const AdminPage = () => {
               return (
                 <article
                   key={item.id}
-                  className="rounded border border-slate-300 bg-white p-4 shadow-sm"
+                  className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg"
                 >
                   <CardActions
                     isEditing={isEditing}
@@ -464,10 +467,10 @@ const AdminPage = () => {
                     </div>
                   ) : (
                     <div className="mt-4">
-                      <h2 className="text-lg font-bold text-orange-600">
+                      <h2 className="text-lg font-bold text-[#ff6a1f]">
                         {item.title}
                       </h2>
-                      <p className="mt-2 text-sm text-slate-600">
+                      <p className="mt-2 text-sm text-amber-50/60">
                         {item.accordionItems.join(", ")}
                       </p>
                     </div>
@@ -479,7 +482,7 @@ const AdminPage = () => {
         </AdminSection>
 
         <AdminSection title="Awards">
-          <div className="rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <div className="grid gap-3 md:grid-cols-2">
               <TextInput
                 label="Section title"
@@ -517,9 +520,9 @@ const AdminPage = () => {
             {content.awards.map((item) => (
               <article
                 key={item.id}
-                className="rounded border border-slate-300 bg-white p-4 shadow-sm"
+                className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg"
               >
-                <h3 className="text-lg font-bold text-orange-600">
+                <h3 className="text-lg font-bold text-[#ff6a1f]">
                   {item.name}
                 </h3>
                 <div className="mt-4 grid gap-3">
@@ -650,7 +653,7 @@ const AdminPage = () => {
           actionLabel="Add regulation"
           onAdd={addRegulation}
         >
-          <div className="mb-4 rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="mb-4 rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <div className="grid gap-3 md:grid-cols-2">
               <TextInput
                 label="Title"
@@ -676,7 +679,7 @@ const AdminPage = () => {
               return (
                 <article
                   key={item.id}
-                  className="rounded border border-slate-300 bg-white p-4 shadow-sm"
+                  className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg"
                 >
                   <CardActions
                     isEditing={isEditing}
@@ -703,10 +706,10 @@ const AdminPage = () => {
                     </div>
                   ) : (
                     <div className="mt-4">
-                      <h2 className="text-lg font-bold text-orange-600">
+                      <h2 className="text-lg font-bold text-[#ff6a1f]">
                         {item.title}
                       </h2>
-                      <p className="mt-2 text-sm text-slate-600">
+                      <p className="mt-2 text-sm text-amber-50/60">
                         {item.items.join(" ")}
                       </p>
                     </div>
@@ -722,7 +725,7 @@ const AdminPage = () => {
           actionLabel="Add news"
           onAdd={addNewsItem}
         >
-          <div className="mb-4 rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="mb-4 rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <div className="grid gap-3 md:grid-cols-3">
               <TextInput
                 label="Section title"
@@ -755,7 +758,7 @@ const AdminPage = () => {
               return (
                 <article
                   key={item.id}
-                  className="rounded border border-slate-300 bg-white p-4 shadow-sm"
+                  className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg"
                 >
                   <CardActions
                     isEditing={isEditing}
@@ -797,13 +800,13 @@ const AdminPage = () => {
                     </div>
                   ) : (
                     <div className="mt-4">
-                      <p className="text-xs font-semibold text-slate-500">
+                      <p className="text-xs font-semibold text-amber-50/50">
                         {item.author} - {item.date}
                       </p>
-                      <h2 className="mt-2 text-lg font-bold text-orange-600">
+                      <h2 className="mt-2 text-lg font-bold text-[#ff6a1f]">
                         {item.title}
                       </h2>
-                      <p className="mt-2 line-clamp-3 text-sm text-slate-600">
+                      <p className="mt-2 line-clamp-3 text-sm text-amber-50/60">
                         {item.description}
                       </p>
                     </div>
@@ -819,7 +822,7 @@ const AdminPage = () => {
           actionLabel="Add milestone"
           onAdd={addMilestoneItem}
         >
-          <div className="mb-4 rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="mb-4 rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <div className="grid gap-3 md:grid-cols-2">
               <TextInput
                 label="Section title"
@@ -845,7 +848,7 @@ const AdminPage = () => {
               return (
                 <article
                   key={item.id}
-                  className="rounded border border-slate-300 bg-white p-4 shadow-sm"
+                  className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg"
                 >
                   <CardActions
                     isEditing={isEditing}
@@ -880,11 +883,11 @@ const AdminPage = () => {
                   ) : (
                     <div className="mt-4">
                       {item.detail ? (
-                        <span className="rounded border border-slate-400 px-2 py-1 text-xs font-semibold text-slate-600">
+                        <span className="rounded border border-amber-50/30 px-2 py-1 text-xs font-semibold text-amber-50/70">
                           {item.detail}
                         </span>
                       ) : null}
-                      <p className="mt-3 text-xs font-bold uppercase text-slate-500">
+                      <p className="mt-3 text-xs font-bold uppercase text-amber-50/50">
                         {item.date}
                       </p>
                       <h2 className="mt-1 text-lg font-semibold">
@@ -899,7 +902,7 @@ const AdminPage = () => {
         </AdminSection>
 
         <AdminSection title="Publications Preview">
-          <div className="rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <div className="grid gap-3 md:grid-cols-2">
               <TextInput
                 label="Eyebrow"
@@ -938,7 +941,7 @@ const AdminPage = () => {
               return (
                 <article
                   key={item.id}
-                  className="rounded border border-slate-300 bg-white p-4 shadow-sm"
+                  className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg"
                 >
                   <CardActions
                     isEditing={isEditing}
@@ -950,17 +953,17 @@ const AdminPage = () => {
                     <WorkshopForm item={item} onChange={updateWorkshopItem} />
                   ) : (
                     <div className="mt-4">
-                      <p className="text-xs font-semibold uppercase text-orange-600">
+                      <p className="text-xs font-semibold uppercase text-[#ff6a1f]">
                         {item.eyebrow}
                       </p>
                       <h2 className="mt-2 text-xl font-bold">{item.title}</h2>
-                      <p className="mt-2 text-sm text-slate-600">
+                      <p className="mt-2 text-sm text-amber-50/60">
                         {item.description}
                       </p>
                       <p className="mt-4 text-sm font-semibold">
                         {item.scheduleLabel} - {item.date}
                       </p>
-                      <p className="text-sm text-orange-600">{item.note}</p>
+                      <p className="text-sm text-orange-300">{item.note}</p>
                     </div>
                   )}
                 </article>
@@ -970,7 +973,7 @@ const AdminPage = () => {
         </AdminSection>
 
         <AdminSection title="Footer">
-          <div className="rounded border border-slate-300 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-amber-50/10 bg-zinc-900 p-4 shadow-lg">
             <div className="grid gap-3 md:grid-cols-2">
               <TextInput
                 label="Headline 1"
@@ -1065,7 +1068,7 @@ const AdminSection = ({
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-2 rounded border border-slate-400 px-3 py-2 text-sm font-semibold text-slate-800 transition hover:bg-white"
+          className="inline-flex items-center gap-2 rounded-lg border border-amber-50/25 px-3 py-2 text-sm font-semibold text-amber-50 transition hover:border-[#ff6a1f] hover:bg-amber-50/10"
         >
           <FaPlus />
           {actionLabel}
@@ -1094,7 +1097,7 @@ const CardActions = ({
       <button
         type="button"
         onClick={onDone}
-        className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-300 text-slate-700 transition hover:bg-slate-100"
+        className="inline-flex h-9 w-9 items-center justify-center rounded border border-amber-50/20 text-amber-50/70 transition hover:border-[#ff6a1f] hover:bg-amber-50/10 hover:text-amber-50"
         aria-label="Done"
         title="Done"
       >
@@ -1104,7 +1107,7 @@ const CardActions = ({
       <button
         type="button"
         onClick={onEdit}
-        className="inline-flex h-9 w-9 items-center justify-center rounded border border-slate-300 text-slate-700 transition hover:bg-slate-100"
+        className="inline-flex h-9 w-9 items-center justify-center rounded border border-amber-50/20 text-amber-50/70 transition hover:border-[#ff6a1f] hover:bg-amber-50/10 hover:text-amber-50"
         aria-label="Edit"
         title="Edit"
       >
@@ -1114,7 +1117,7 @@ const CardActions = ({
     <button
       type="button"
       onClick={onDelete}
-      className="inline-flex h-9 w-9 items-center justify-center rounded border border-red-200 text-red-600 transition hover:bg-red-50"
+      className="inline-flex h-9 w-9 items-center justify-center rounded border border-red-400/30 text-red-400 transition hover:bg-red-500/10"
       aria-label="Delete"
       title="Delete"
     >

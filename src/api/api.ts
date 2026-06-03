@@ -1,9 +1,10 @@
 import type { MentorItem } from "../data/mentorData";
 import type { PublicationItem } from "../data/publicationsData";
+import type { EditableContent } from "../data/contentData";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "") ??
-  "https://src2026backendmain.vercel.app";
+  import.meta.env.VITE_TEST_API_BASE_URL?.replace(/\/+$/, "")
+// "https://src2026backendmain.vercel.app";
 
 export const API_ENDPOINTS = {
   mentors: `${API_BASE_URL}/mentor`,
@@ -418,4 +419,17 @@ export const parsePublicationDate = (date: string) => {
   }
 
   return new Date();
+};
+
+export const getPageContent = async (
+  signal?: AbortSignal,
+): Promise<EditableContent> => {
+  const response = await fetch(`${API_BASE_URL}/content`, { signal });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch page content: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { data: EditableContent };
+  return payload.data;
 };

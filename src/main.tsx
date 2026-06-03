@@ -7,6 +7,7 @@ import App from "./App.tsx";
 import Mentor from "./components/mentor/Mentor";
 import NewsList from "./components/news/NewsList.tsx";
 import NewsDetail from "./components/news/NewsDetail.tsx";
+import PostNews from "./components/news/postNews.tsx";
 import PublicationDetail from "./components/publications/PublicationDetail.tsx";
 import PublicationsList from "./components/publications/PublicationsList.tsx";
 import SubmissionPage from "./components/submission/SubmissionPage.tsx";
@@ -26,6 +27,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/mentors" element={<Mentor />} />
           <Route path="/news-list" element={<NewsList />} />
           <Route path="/news-list/:id" element={<NewsDetail />} />
+          <Route path="/post-news" element={<PostNews />} />
           <Route path="/publications" element={<PublicationsList />} />
           <Route path="/publications/:id" element={<PublicationDetail />} />
           <Route path="/submit" element={<SubmissionPage />} />

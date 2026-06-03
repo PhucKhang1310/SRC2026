@@ -9,6 +9,7 @@ const News = () => {
   const navigate = useNavigate();
   const { news, newsReadAllLabel, newsSubtitle, newsTitle } =
     useEditableContent();
+
   const loopedNews = [...news, ...news, ...news];
 
   const topStory = loopedNews[0];

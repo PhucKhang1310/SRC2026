@@ -6,11 +6,12 @@ import resfesMentor from "../../assets/resfes_mentor.jpg";
 import { useFadeIn } from "../../hook/useFadeIn";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import { FaChevronDown } from "react-icons/fa6";
-import { useEditableContent } from "../../hook/useEditableContent";
+import { usePageContent } from "../../hook/usePageContent";
 
 const AboutUs = () => {
   const { isMobile } = useCheckMobile();
-  const { about } = useEditableContent();
+  const { content } = usePageContent();
+  const about = content?.about;
   const [showMore, setShowMore] = useState(isMobile ? false : true);
   const images = [resfesPlasma, resfesTour, resfesWind, resfesMentor];
 
@@ -30,6 +31,10 @@ const AboutUs = () => {
     const activeIdx = Math.round(carousel.scrollLeft / itemWidth);
     setActiveIndex(Math.min(activeIdx, images.length - 1));
   };
+
+  if (!about) {
+    return null;
+  }
 
   const renderCarousel = () => {
     if (isMobile) {
