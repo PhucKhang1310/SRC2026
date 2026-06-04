@@ -8,7 +8,7 @@ import NavBar from "./components/navbar/NavBar";
 import Regulations from "./components/regulations/Regulations";
 import ResearchFields from "./components/research/ResearchFields";
 import News from "./pages/news/News";
-import Publications from "./pages/publications/PublicationsList";
+import Publications from "./pages/publications/Publications";
 import Workshops from "./components/workshops/Workshops";
 import LazyWrapper from "./components/wrapper/LazyWrapper";
 

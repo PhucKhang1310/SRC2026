@@ -1,7 +1,7 @@
 const API_BASE_URL =
     import.meta.env.VITE_TEST_API_BASE_URL?.replace(/\/+$/, "") ??
-    // "https://src2026backendmain.vercel.app/api/v1";
-    "http://localhost:3000/api/v1";
+    "https://src2026backendmain.vercel.app/api/v1";
+// "http://localhost:3000/api/v1";
 
 type ApiRecord = Record<string, unknown>;
 

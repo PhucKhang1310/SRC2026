@@ -7,15 +7,72 @@ const API_BASE_URL =
   "https://src2026backendmain.vercel.app/api/v1";
 
 export const API_ENDPOINTS = {
-  mentors: `${API_BASE_URL}/api/v1/mentor`,
-  mentorSubmit: `${API_BASE_URL}/api/v1/mentor/submit`,
-  publications: `${API_BASE_URL}/api/v1/publication`,
-  publicationSubmit: `${API_BASE_URL}/api/v1/publication/submit`,
-  signup: `${API_BASE_URL}/api/v1/auth/signup`,
-  login: `${API_BASE_URL}/api/v1/auth/login`,
+  mentors: `${API_BASE_URL}/mentor`,
+  mentorSubmit: `${API_BASE_URL}/mentor/submit`,
+  news: `${API_BASE_URL}/news`,
+  content: `${API_BASE_URL}/content`,
+  publications: `${API_BASE_URL}/publication`,
+  publicationSubmit: `${API_BASE_URL}/publication/submit`,
+  signup: `${API_BASE_URL}/auth/signup`,
+  login: `${API_BASE_URL}/auth/login`,
 } as const;
 
 type ApiRecord = Record<string, unknown>;
+
+const retryableStatuses = new Set([408, 429, 500, 502, 503, 504]);
+
+const delay = (milliseconds: number, signal?: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException("Request aborted", "AbortError"));
+      return;
+    }
+
+    const timeoutId = window.setTimeout(resolve, milliseconds);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        window.clearTimeout(timeoutId);
+        reject(new DOMException("Request aborted", "AbortError"));
+      },
+      { once: true },
+    );
+  });
+
+const fetchWithRetry = async (
+  url: string,
+  options: RequestInit = {},
+  retries = 2,
+) => {
+  const signal = options.signal as AbortSignal | undefined;
+  let lastResponse: Response | null = null;
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok || !retryableStatuses.has(response.status) || attempt === retries) {
+        return response;
+      }
+
+      lastResponse = response;
+    } catch (error) {
+      if (signal?.aborted || attempt === retries) {
+        throw error;
+      }
+
+      lastError = error;
+    }
+
+    await delay(350 * (attempt + 1), signal);
+  }
+
+  if (lastResponse) {
+    return lastResponse;
+  }
+
+  throw lastError instanceof Error ? lastError : new Error("Request failed");
+};
 
 const stripHtml = (value: string) =>
   value
@@ -113,7 +170,7 @@ const normalizePublications = (payload: unknown): PublicationItem[] =>
     );
 
 export const fetchPublications = async (signal?: AbortSignal) => {
-  const response = await fetch(API_ENDPOINTS.publications, { signal });
+  const response = await fetchWithRetry(API_ENDPOINTS.publications, { signal });
 
   if (!response.ok) {
     throw new Error(`Publications request failed with ${response.status}`);
@@ -257,7 +314,7 @@ const normalizeMentors = (payload: unknown): MentorItem[] =>
     .filter((mentor): mentor is MentorItem => Boolean(mentor?.name));
 
 export const fetchMentors = async (signal?: AbortSignal) => {
-  const response = await fetch(API_ENDPOINTS.mentors, { signal });
+  const response = await fetchWithRetry(API_ENDPOINTS.mentors, { signal });
 
   if (!response.ok) {
     throw new Error(`Mentors request failed with ${response.status}`);
@@ -476,7 +533,7 @@ const normalizeNewsRecords = (payload: unknown): NewsRecord[] =>
     .filter((news): news is NewsRecord => Boolean(news));
 
 export const fetchNews = async (signal?: AbortSignal) => {
-  const response = await fetch(API_ENDPOINTS.news, { signal });
+  const response = await fetchWithRetry(API_ENDPOINTS.news, { signal });
 
   if (!response.ok) {
     throw new Error(`News request failed with ${response.status}`);
@@ -547,7 +604,7 @@ export const parsePublicationDate = (date: string) => {
 export const getPageContent = async (
   signal?: AbortSignal,
 ): Promise<EditableContent> => {
-  const response = await fetch(API_ENDPOINTS.content, { signal });
+  const response = await fetchWithRetry(API_ENDPOINTS.content, { signal });
 
   if (!response.ok) {
     throw new Error(`Failed to fetch page content: ${response.status}`);
