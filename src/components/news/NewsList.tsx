@@ -1,104 +1,136 @@
 import { useEffect, useMemo, useState } from "react";
-import fptLogo from "../../assets/fpt_logo.jpg"
-import type { NewsItem } from "../../data/newsData";
-import NavBar from "../navbar/NavBar";
-import Pagination from "../pagination/Pagination";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
-import Footer from "../footer/Footer";
+import { getNews, type NewsApiItem } from "../../api/newsApi";
+import fptLogo from "../../assets/fpt_logo.jpg";
 import { useCheckMobile } from "../../hook/useCheckMobile";
-import { useEditableContent } from "../../hook/useEditableContent";
+// import Footer from "../footer/Footer";
+import NavBar from "../navbar/NavBar";
+import Pagination from "../pagination/Pagination";
 
 const NewsList = () => {
-    let pageSize = 9;
-    const { news } = useEditableContent();
-    const newsList: NewsItem[] = useMemo(() => [...news, ...news, ...news], [news]);
-    const [newsItems, setNewsItems] = useState<NewsItem[]>(newsList.slice(0, pageSize));
-    const [currentPage, setCurrentPage] = useState(1);
     const navigate = useNavigate();
     const location = useLocation();
     const { isMobile } = useCheckMobile();
-    if (isMobile) {
-        pageSize = 4;
-    }
+    const pageSize = isMobile ? 4 : 9;
+    const [newsList, setNewsList] = useState<NewsApiItem[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        const handlePageChange = () => {
-            const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = startIndex + pageSize;
-            setNewsItems(newsList.slice(startIndex, endIndex));
-        }
+        const controller = new AbortController();
 
-        handlePageChange();
+        const loadNews = async () => {
+            try {
+                setIsLoading(true);
+                setError("");
+                setNewsList(await getNews(controller.signal));
+            } catch (loadError) {
+                if (controller.signal.aborted) return;
+                setError(loadError instanceof Error ? loadError.message : "Failed to load news.");
+            } finally {
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
+            }
+        };
 
-        return () => handlePageChange();
-    }, [currentPage, pageSize, newsList]);
+        void loadNews();
+
+        return () => controller.abort();
+    }, []);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [pageSize]);
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
-    }, [location, currentPage])
+    }, [location, currentPage]);
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    }
+    const newsItems = useMemo(() => {
+        const startIndex = (currentPage - 1) * pageSize;
+        return newsList.slice(startIndex, startIndex + pageSize);
+    }, [currentPage, newsList, pageSize]);
 
     const handleBackToNewsPage = () => {
         navigate("/home#news");
-    }
+    };
 
     return (
-        <main className="bg-black min-h-screen text-amber-50">
+        <main className="min-h-screen bg-black text-amber-50">
             <NavBar />
             <section className="mx-auto w-4/5 max-w-7xl pt-36">
                 <div>
                     <button
+                        type="button"
                         onClick={handleBackToNewsPage}
-                        className="text-md flex items-center ml-6 gap-2 cursor-pointer">
+                        className="text-md ml-6 flex cursor-pointer items-center gap-2"
+                    >
                         <FaArrowLeft size={16} />
                         Back
                     </button>
                 </div>
-                <div className="text-3xl font-bold w-full max-w-7xl py-4 pl-6 ">
+
+                <div className="w-full max-w-7xl py-4 pl-6 text-3xl font-bold">
                     SRC2026 News
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-16 p-6">
-                    {newsItems.length > 0 ? newsItems.map((newsItem, index) => (
-                        <a
-                            key={`news-item-${index}-${newsItem.id}`}
-                            href={`/news-list/${newsItem.id}`}
-                            className="group flex flex-col overflow-hidden rounded-lg cursor-pointer p-2"
-                        >
-                            <div className="overflow-hidden">
-                                <img
-                                    src={fptLogo}
-                                    alt="FPT Logo"
-                                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                                />
-                            </div>
-                            <div className="mt-4 flex flex-col flex-1 gap-4">
-                                <div className="flex justify-between items-center text-white text-sm">
-                                    <span className="font-medium">{newsItem.author}</span>
-                                    <span>{new Date(newsItem.date).toLocaleDateString("vi-VN")}</span>
+
+                {error && (
+                    <p className="mx-6 rounded border border-red-500/40 bg-red-950/40 px-4 py-3 text-sm text-red-100">
+                        {error}
+                    </p>
+                )}
+
+                <div className="grid grid-cols-1 gap-x-4 gap-y-16 p-6 md:grid-cols-2 lg:grid-cols-3">
+                    {isLoading ? (
+                        <p className="col-span-full py-12 text-center text-white/70">Loading news...</p>
+                    ) : newsItems.length > 0 ? (
+                        newsItems.map((newsItem) => (
+                            <a
+                                key={newsItem._id}
+                                href={`/news-list/${newsItem._id}`}
+                                className="group flex cursor-pointer flex-col overflow-hidden rounded-lg p-2"
+                            >
+                                <div className="overflow-hidden">
+                                    <img
+                                        src={newsItem.thumbNailImage || fptLogo}
+                                        alt={newsItem.title}
+                                        className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    />
                                 </div>
-                                <h3 className="line-clamp-2 font-semibold text-base text-[#f27255]">{newsItem.title}</h3>
-                            </div>
-                        </a>
-                    )) : (
-                        <p className="col-span-full py-12 text-center text-white/70">No news items are available.</p>
+                                <div className="mt-4 flex flex-1 flex-col gap-4">
+                                    <div className="flex items-center justify-between text-sm text-white">
+                                        <span className="font-medium">{newsItem.author}</span>
+                                        <span>{new Date(newsItem.date).toLocaleDateString("vi-VN")}</span>
+                                    </div>
+                                    <h3 className="line-clamp-2 text-base font-semibold text-[#f27255]">
+                                        {newsItem.title}
+                                    </h3>
+                                </div>
+                            </a>
+                        ))
+                    ) : (
+                        <p className="col-span-full py-12 text-center text-white/70">
+                            No news items are available.
+                        </p>
                     )}
                 </div>
 
-                <Pagination
-                    className="mt-8"
-                    currentPage={currentPage}
-                    totalCount={newsList.length}
-                    pageSize={pageSize}
-                    onPageChange={handlePageChange}
-                />
+                {!isLoading && newsList.length > pageSize && (
+                    <Pagination
+                        className="mt-8"
+                        currentPage={currentPage}
+                        totalCount={newsList.length}
+                        pageSize={pageSize}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
             </section>
-            <Footer />
+            {/* <Footer /> */}
         </main>
-    )
-}
+    );
+};
 
 export default NewsList;

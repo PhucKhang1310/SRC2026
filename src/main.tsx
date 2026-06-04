@@ -12,6 +12,8 @@ import PublicationDetail from "./components/publications/PublicationDetail.tsx";
 import PublicationsList from "./components/publications/PublicationsList.tsx";
 import SubmissionPage from "./components/submission/SubmissionPage.tsx";
 import AdminPage from "./components/admin/AdminPage.tsx";
+import NewsAdminPage from "./components/admin/NewsAdminPage.tsx";
+import NewsUploadAdminPage from "./components/admin/NewsUploadAdminPage.tsx";
 import RegistrationPage from "./components/registration/RegistrationPage.tsx";
 import LoginPage from "./components/authentication/Login.tsx";
 import SignUp from "./components/authentication/Signup.tsx";
@@ -32,6 +34,8 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/publications/:id" element={<PublicationDetail />} />
           <Route path="/submit" element={<SubmissionPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/news" element={<NewsAdminPage />} />
+          <Route path="/admin/news/upload" element={<NewsUploadAdminPage />} />
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/auth/login" element={<LoginPage />} />
           <Route path="/auth/signup" element={<SignUp />} />
