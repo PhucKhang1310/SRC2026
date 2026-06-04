@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
 import { fetchPublicationById, parsePublicationDate } from "../../api/api";
 import type { PublicationItem } from "../../data/publicationsData";
-import NavBar from "../navbar/NavBar";
-import Footer from "../footer/Footer";
+import NavBar from "../../components/navbar/NavBar";
+import Footer from "../../components/navbar/NavBar";
 
 const sanitizePublicationHtml = (html: string) =>
   html

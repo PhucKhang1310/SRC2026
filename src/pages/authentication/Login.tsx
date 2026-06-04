@@ -64,7 +64,7 @@ const Login = () => {
                         <input
                             type="password"
                             id="password"
-                            placeholder="••••••••"
+                            placeholder="Your password..."
                             className="bg-black border border-white/20 rounded-lg p-3 text-white placeholder-white/30 focus:outline-none focus:border-[#ff6a1f] focus:ring-1 focus:ring-[#ff6a1f] transition-all"
                         />
                     </div>

@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "
 import { FaArrowLeft, FaImage, FaPaperPlane } from "react-icons/fa6";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useUser } from "../../hook/useUser";
-import Footer from "../footer/Footer";
-import NavBar from "../navbar/NavBar";
+import Footer from "../../components/footer/Footer";
+import NavBar from "../../components/navbar/NavBar";
 
 const inputClass =
   "w-full rounded-lg border border-white/15 bg-zinc-950 px-4 py-3 text-sm text-amber-50 outline-none transition placeholder:text-amber-50/30 focus:border-[#ff6a1f] focus:ring-2 focus:ring-[#ff6a1f]/20";
@@ -148,10 +148,10 @@ const PostNews = () => {
                 <img
                   src={thumbnailPreviewUrl}
                   alt="Selected news thumbnail preview"
-                  className="aspect-[4/3] w-full object-cover"
+                  className="aspect-4/3 w-full object-cover"
                 />
               ) : (
-                <div className="flex aspect-[4/3] w-full items-center justify-center bg-zinc-950 text-amber-50/35">
+                <div className="flex aspect-4/3 w-full items-center justify-center bg-zinc-950 text-amber-50/35">
                   <FaImage size={38} />
                 </div>
               )}

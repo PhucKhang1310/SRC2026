@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getNews, type NewsApiItem } from "../../api/newsApi";
+import { fetchNews, type NewsRecord } from "../../api/api";
 import fptLogo from "../../assets/fpt_logo.jpg";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 // import Footer from "../footer/Footer";
-import NavBar from "../navbar/NavBar";
-import Pagination from "../pagination/Pagination";
+import NavBar from "../../components/navbar/NavBar";
+import Pagination from "../../components/pagination/Pagination";
 
 const NewsList = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isMobile } = useCheckMobile();
     const pageSize = isMobile ? 4 : 9;
-    const [newsList, setNewsList] = useState<NewsApiItem[]>([]);
+    const [newsList, setNewsList] = useState<NewsRecord[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -25,7 +25,7 @@ const NewsList = () => {
             try {
                 setIsLoading(true);
                 setError("");
-                setNewsList(await getNews(controller.signal));
+                setNewsList(await fetchNews(controller.signal));
             } catch (loadError) {
                 if (controller.signal.aborted) return;
                 setError(loadError instanceof Error ? loadError.message : "Failed to load news.");

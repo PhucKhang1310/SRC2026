@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
   mentors: `${API_BASE_URL}/mentor`,
   mentorSubmit: `${API_BASE_URL}/mentor/submit`,
   news: `${API_BASE_URL}/news`,
+  content: `${API_BASE_URL}/content`,
   publications: `${API_BASE_URL}/publication`,
   publicationSubmit: `${API_BASE_URL}/publication/submit`,
   signup: `${API_BASE_URL}/auth/signup`,
@@ -548,10 +549,79 @@ export const parsePublicationDate = (date: string) => {
 export const getPageContent = async (
   signal?: AbortSignal,
 ): Promise<EditableContent> => {
-  const response = await fetch(`${API_BASE_URL}/content`, { signal });
+  const response = await fetch(API_ENDPOINTS.content, { signal });
 
   if (!response.ok) {
     throw new Error(`Failed to fetch page content: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { data: EditableContent };
+  return payload.data;
+};
+
+export const updatePageContent = async (
+  content: EditableContent,
+  signal?: AbortSignal,
+): Promise<EditableContent> => {
+  const {
+    hero,
+    about,
+    researchTitle,
+    researchFields,
+    awardsTitle,
+    awardsStandardLabel,
+    awardsSmallLabel,
+    awards,
+    awardsNote,
+    regulationsTitle,
+    regulationsSubtitle,
+    regulations,
+    newsTitle,
+    newsSubtitle,
+    newsReadAllLabel,
+    milestonesTitle,
+    milestonesNote,
+    milestones,
+    publicationsHome,
+    workshops,
+    footer,
+  } = content;
+
+  const response = await fetch(API_ENDPOINTS.content, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      hero,
+      about,
+      researchTitle,
+      researchFields,
+      awardsTitle,
+      awardsStandardLabel,
+      awardsSmallLabel,
+      awards,
+      awardsNote,
+      regulationsTitle,
+      regulationsSubtitle,
+      regulations,
+      newsTitle,
+      newsSubtitle,
+      newsReadAllLabel,
+      milestonesTitle,
+      milestonesNote,
+      milestones,
+      publicationsHome,
+      workshops,
+      footer,
+    }),
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await readErrorMessage(response, `Failed to update page content: ${response.status}`),
+    );
   }
 
   const payload = (await response.json()) as { data: EditableContent };

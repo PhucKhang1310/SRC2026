@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import MentorList from "./MentorList";
 import { fetchMentors } from "../../api/api";
 import type { MentorItem } from "../../data/mentorData";
-import Pagination from "../pagination/Pagination";
-import NavBar from "../navbar/NavBar";
-import Footer from "../footer/Footer";
+import Pagination from "../../components/pagination/Pagination";
+import NavBar from "../../components/navbar/NavBar";
+import Footer from "../../components/footer/Footer";
 import {
   FaLaptopCode,
   FaLanguage,
@@ -139,11 +139,10 @@ const Mentor = () => {
                   key={department}
                   type="button"
                   onClick={() => setActiveDepartment(department)}
-                  className={`btn btn-sm rounded-full border flex items-center gap-1.5 ${
-                    activeDepartment === department
+                  className={`btn btn-sm rounded-full border flex items-center gap-1.5 ${activeDepartment === department
                       ? "border-white bg-white text-black hover:bg-white/90"
                       : "border-white bg-transparent text-white hover:bg-white hover:text-black"
-                  }`}
+                    }`}
                 >
                   {Icon && <Icon className="size-3.5" />}
                   {department}
