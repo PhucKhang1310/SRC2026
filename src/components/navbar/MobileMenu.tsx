@@ -1,3 +1,5 @@
+import { useUser } from "../../hook/useUser";
+
 const listItem = [
   {
     href: "/home#about",
@@ -35,6 +37,10 @@ const listItem = [
     href: "/submit",
     label: "Submit",
   },
+  {
+    href: "/auth/login",
+    label: "Login",
+  }
 ];
 
 type MobileMenuProps = {
@@ -43,20 +49,19 @@ type MobileMenuProps = {
 };
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+  const { user } = useUser();
   return (
     <>
       <div
-        className={`fixed inset-0 z-40 bg-black/60 transition-opacity duration-200 ${
-          isOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
+        className={`fixed inset-0 z-40 bg-black/60 transition-opacity duration-200 ${isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+          }`}
         onClick={onClose}
         aria-hidden="true"
       />
 
       <aside
-        className={`fixed right-0 top-0 z-50 h-dvh w-80 max-w-[85vw] bg-black text-white shadow-2xl transition-transform duration-200 ease-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed right-0 top-0 z-50 h-dvh w-80 max-w-[85vw] bg-black text-white shadow-2xl transition-transform duration-200 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
         role="dialog"
         aria-modal="true"
       >
@@ -80,6 +85,13 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               </a>
             </li>
           ))}
+          {user && (
+            <li>
+              <a href="/admin" onClick={onClose}>
+                Admin
+              </a>
+            </li>
+          )}
         </ul>
       </aside>
     </>

@@ -2,7 +2,7 @@ import { useRef, useCallback } from "react";
 import { FaMedal, FaTrophy, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { useFadeIn } from "../../hook/useFadeIn";
 import type { AwardCommittee, AwardTier } from "../../data/contentData";
-import { useEditableContent } from "../../hook/useEditableContent";
+import { usePageContent } from "../../hook/usePageContent";
 
 const AwardCard = ({ award }: { award: AwardTier }) => (
   <div className="flex flex-col items-center gap-1 rounded-xl bg-white/5 backdrop-blur-sm px-4 py-4 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
@@ -94,13 +94,12 @@ function scrollToChild(el: HTMLDivElement, childIdx: number, behavior: ScrollBeh
 
 const Awards = () => {
   const { inView, ref } = useFadeIn(0.15, 80);
-  const {
-    awards,
-    awardsNote,
-    awardsSmallLabel,
-    awardsStandardLabel,
-    awardsTitle,
-  } = useEditableContent();
+  const { content } = usePageContent();
+  const awards = content?.awards ?? [];
+  const awardsNote = content?.awardsNote ?? "";
+  const awardsSmallLabel = content?.awardsSmallLabel ?? "";
+  const awardsStandardLabel = content?.awardsStandardLabel ?? "";
+  const awardsTitle = content?.awardsTitle ?? "";
   const carouselRef = useRef<HTMLDivElement>(null);
   const isResetting = useRef(false);
   const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -172,6 +171,10 @@ const Awards = () => {
     if (scrollTimer.current) clearTimeout(scrollTimer.current);
     scrollTimer.current = setTimeout(handleScrollEnd, 100);
   }, [handleScrollEnd]);
+
+  if (!content) {
+    return null;
+  }
 
   return (
     <section

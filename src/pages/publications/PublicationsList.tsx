@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { fetchPublications, parsePublicationDate } from "../../api/api";
 import type { PublicationItem } from "../../data/publicationsData";
-import NavBar from "../navbar/NavBar";
-import Footer from "../footer/Footer";
-import Pagination from "../pagination/Pagination";
+import NavBar from "../../components/navbar/NavBar";
+import Footer from "../../components/navbar/NavBar";
+import Pagination from "../../components/pagination/Pagination";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCheckMobile } from "../../hook/useCheckMobile";
