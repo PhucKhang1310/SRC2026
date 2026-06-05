@@ -1,73 +1,179 @@
-# React + TypeScript + Vite
+# SRC2026 Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SRC2026 is the frontend web application for the Science Research Festival 2026 platform. It is built with React, TypeScript, Vite, Tailwind CSS, and DaisyUI, and connects to the SRC2026 backend API for mentors, publications, submissions, news, image uploads, and notification-backed workflows.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Tailwind CSS
+- DaisyUI
+- React Icons
+- Fetch API client in `src/api/api.ts`
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Public event landing page with hero, about, research fields, awards, regulations, milestones, news, publications, workshops, and footer sections.
+- Mentor directory with live API data, department filtering, search, and pagination.
+- Publications pages with API-backed listing and detail views.
+- News list and detail pages.
+- Submission page for mentor profile CSV data and publication BibTeX data.
+- Registration form stored in browser local storage.
+- Authentication UI pages and protected admin route using locally stored auth token.
+- SPA deployment support through Vercel rewrites.
 
-## Expanding the ESLint configuration
+## System Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```mermaid
+flowchart LR
+    User["User / Admin / Mentor"] --> Frontend["Frontend<br/>React + TypeScript + Vite"]
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+    Frontend --> ApiClient["API Client<br/>src/api/api.ts"]
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+    ApiClient -->|HTTP requests| Backend["Backend API<br/>Express + TypeScript"]
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+    Backend --> Publication["Publication Routes<br/>/publication"]
+    Backend --> Mentor["Mentor Routes<br/>/mentor"]
+    Backend --> News["News Routes<br/>/news"]
+
+    Backend --> Swagger["Swagger Docs<br/>/swagger<br/>/openapi.json"]
+
+    Publication --> PublicationControllers["Publication Controllers<br/>Get Publications<br/>Get Publication By ID<br/>Submit Publication<br/>Upload Image<br/>Delete Image"]
+
+    Mentor --> MentorControllers["Mentor Controllers<br/>Get Mentors<br/>Submit Mentor Profile<br/>Upload Mentor Avatar"]
+
+    News --> NewsControllers["News Controller<br/>Get News"]
+
+    PublicationControllers --> PublicationModel["Publication Model<br/>publicationCollection"]
+    PublicationControllers --> PendingPublicationModel["Pending Publication Model<br/>pendingPublicationCollection"]
+
+    MentorControllers --> MentorModel["Mentor Model<br/>mentorsCollection"]
+    MentorControllers --> PendingMentorModel["Pending Mentor Profile Model<br/>pendingMentorsCollection"]
+
+    NewsControllers --> NewsModel["News Model<br/>newsCollection"]
+
+    PublicationModel --> MongoDB["MongoDB Atlas"]
+    PendingPublicationModel --> MongoDB
+    MentorModel --> MongoDB
+    PendingMentorModel --> MongoDB
+    NewsModel --> MongoDB
+
+    PublicationControllers --> CloudinaryPub["Cloudinary<br/>Publication Images"]
+    MentorControllers --> CloudinaryMentor["Cloudinary<br/>Mentor Avatars"]
+
+    PublicationControllers --> Email["Email Service<br/>Nodemailer / Gmail SMTP"]
+
+    Frontend --> LocalStorage["Browser Local Storage<br/>Auth Token<br/>Registration Data"]
+
+    Backend --> Env["Environment Variables<br/>MONGO_URI<br/>CLOUDINARY_*<br/>GMAIL_*<br/>NOTIFY_EMAIL"]
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Project Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+src/
+  api/                 API endpoint definitions and response normalization
+  assets/              Images and static visual assets
+  components/          Page sections, pages, and reusable UI components
+  data/                Static fallback/content data
+  hook/                Shared React hooks
+  App.tsx              Home page composition
+  main.tsx             React Router setup and app bootstrap
 ```
+
+## Frontend Routes
+
+| Route | Purpose |
+| --- | --- |
+| `/home` | Main SRC2026 landing page |
+| `/mentors` | Mentor directory |
+| `/news-list` | News listing |
+| `/news-list/:id` | News detail |
+| `/publications` | Publications listing |
+| `/publications/:id` | Publication detail |
+| `/submit` | Mentor and publication submission |
+| `/register` | Research registration form |
+| `/admin` | Protected admin page |
+| `/auth/login` | Login page |
+| `/auth/signup` | Signup page |
+
+## API Configuration
+
+The frontend reads the backend base URL from `VITE_API_BASE_URL`.
+
+Create a `.env` file in this directory when running against a local or custom backend:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+If `VITE_API_BASE_URL` is not set, the app uses:
+
+```text
+https://src2026backendmain.vercel.app
+```
+
+Primary API calls are defined in `src/api/api.ts`:
+
+- `GET /mentor`
+- `POST /mentor/submit`
+- `GET /publication`
+- `POST /publication/submit`
+- `POST /auth/signup`
+- `POST /auth/login`
+
+Note: the frontend currently defines auth API calls, but the backend entry point in this workspace mounts publication, mentor, news, Swagger, and OpenAPI routes.
+
+## Getting Started
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+Run linting:
+
+```bash
+npm run lint
+```
+
+## Deployment
+
+This app is ready for SPA deployment on Vercel. The `vercel.json` file rewrites all routes back to `/`, allowing React Router routes such as `/mentors` and `/publications/:id` to load correctly on refresh.
+
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+}
+```
+
+## Related Backend
+
+The backend for this frontend lives in the sibling project:
+
+```text
+../src2026_backend_main
+```
+
+It provides the Express API, MongoDB persistence, Cloudinary upload integration, Nodemailer email notifications, and Swagger documentation.
