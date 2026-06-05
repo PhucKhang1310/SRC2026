@@ -1,0 +1,33 @@
+import { useEffect, useState } from "react";
+import { getPageContent } from "../api/api";
+import type { EditableContent } from "../data/contentData";
+import { PageContentContext } from "./pageContentContextValue";
+
+export const PageContentProvider = ({
+    children,
+}: {
+    children: React.ReactNode;
+}) => {
+    const [content, setContent] = useState<EditableContent | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        getPageContent(controller.signal)
+            .then(setContent)
+            .catch((error: Error) => {
+                if (error.name !== "AbortError") setError(error.message);
+            })
+            .finally(() => setLoading(false));
+
+        return () => controller.abort();
+    }, []);
+
+    return (
+        <PageContentContext value={{ content, loading, error }}>
+            {children}
+        </PageContentContext>
+    );
+};

@@ -1,11 +1,11 @@
 import workshopImage from "../../assets/resfes_tour.jpg";
 import { useCheckMobile } from "../../hook/useCheckMobile";
-import { useEditableContent } from "../../hook/useEditableContent";
+import { usePageContent } from "../../hook/usePageContent";
 
 const Workshops = () => {
   const { isMobile } = useCheckMobile();
-  const { workshops } = useEditableContent();
-  const workshop = workshops[0];
+  const { content } = usePageContent();
+  const workshop = content?.workshops[0];
 
   if (!workshop) {
     return null;

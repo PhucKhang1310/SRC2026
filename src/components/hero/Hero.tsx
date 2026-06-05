@@ -6,30 +6,44 @@ import logoFptu from '../../assets/logo-fptu.png'
 // import resfes2025 from '../../assets/2025-RES FES-VUÔNG-WHITE.png'
 import resfes2026 from '../../assets/logo_src_white_nobg.png'
 import fptLogoFixed from "../../assets/fpt_logo-removebg-preview_cropped.png";
-import { useEditableContent } from "../../hook/useEditableContent";
+import { usePageContent } from "../../hook/usePageContent";
 
 
 const Hero = () => {
   const { isMobile } = useCheckMobile()
-  const { hero } = useEditableContent();
-
-  const targetDate = new Date(hero.registrationDeadline).getTime();
-
-  const calculateTimeLeft = () => {
-    const now = Date.now();
-    const diff = Math.max(0, Math.floor((targetDate - now) / 1000));
-    return diff;
-  };
-
-  const [totalSeconds, setTotalSeconds] = useState(calculateTimeLeft);
+  const { content, loading, error } = usePageContent();
+  const hero = content?.hero;
+  const registrationDeadline = hero?.registrationDeadline;
+  const [totalSeconds, setTotalSeconds] = useState(0);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setTotalSeconds(calculateTimeLeft());
-    }, 1000);
+    if (!registrationDeadline) return;
+
+    const updateTimeLeft = () => {
+      const targetDate = new Date(registrationDeadline).getTime();
+      const diff = Math.max(0, Math.floor((targetDate - Date.now()) / 1000));
+      setTotalSeconds(diff);
+    };
+
+    updateTimeLeft();
+    const timer = window.setInterval(updateTimeLeft, 1000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [registrationDeadline]);
+
+  if (loading) {
+    return <section id="home" className="min-h-screen bg-black" />;
+  }
+
+  if (error || !hero) {
+    return (
+      <section
+        id="home"
+        className="flex min-h-screen items-center justify-center bg-black px-6 text-center text-white"
+      >
+      </section>
+    );
+  }
 
   const days = Math.floor(totalSeconds / (24 * 60 * 60));
   const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));

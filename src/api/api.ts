@@ -1,13 +1,16 @@
 import type { MentorItem } from "../data/mentorData";
 import type { PublicationItem } from "../data/publicationsData";
+import type { EditableContent } from "../data/contentData";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "") ??
-  "https://src2026backendmain.vercel.app";
+  import.meta.env.VITE_TEST_API_BASE_URL?.replace(/\/+$/, "") ??
+  "https://src2026backendmain.vercel.app/api/v1";
 
 export const API_ENDPOINTS = {
   mentors: `${API_BASE_URL}/mentor`,
   mentorSubmit: `${API_BASE_URL}/mentor/submit`,
+  news: `${API_BASE_URL}/news`,
+  content: `${API_BASE_URL}/content`,
   publications: `${API_BASE_URL}/publication`,
   publicationSubmit: `${API_BASE_URL}/publication/submit`,
   signup: `${API_BASE_URL}/auth/signup`,
@@ -15,6 +18,61 @@ export const API_ENDPOINTS = {
 } as const;
 
 type ApiRecord = Record<string, unknown>;
+
+const retryableStatuses = new Set([408, 429, 500, 502, 503, 504]);
+
+const delay = (milliseconds: number, signal?: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException("Request aborted", "AbortError"));
+      return;
+    }
+
+    const timeoutId = window.setTimeout(resolve, milliseconds);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        window.clearTimeout(timeoutId);
+        reject(new DOMException("Request aborted", "AbortError"));
+      },
+      { once: true },
+    );
+  });
+
+const fetchWithRetry = async (
+  url: string,
+  options: RequestInit = {},
+  retries = 2,
+) => {
+  const signal = options.signal as AbortSignal | undefined;
+  let lastResponse: Response | null = null;
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok || !retryableStatuses.has(response.status) || attempt === retries) {
+        return response;
+      }
+
+      lastResponse = response;
+    } catch (error) {
+      if (signal?.aborted || attempt === retries) {
+        throw error;
+      }
+
+      lastError = error;
+    }
+
+    await delay(350 * (attempt + 1), signal);
+  }
+
+  if (lastResponse) {
+    return lastResponse;
+  }
+
+  throw lastError instanceof Error ? lastError : new Error("Request failed");
+};
 
 const stripHtml = (value: string) =>
   value
@@ -112,7 +170,7 @@ const normalizePublications = (payload: unknown): PublicationItem[] =>
     );
 
 export const fetchPublications = async (signal?: AbortSignal) => {
-  const response = await fetch(API_ENDPOINTS.publications, { signal });
+  const response = await fetchWithRetry(API_ENDPOINTS.publications, { signal });
 
   if (!response.ok) {
     throw new Error(`Publications request failed with ${response.status}`);
@@ -256,7 +314,7 @@ const normalizeMentors = (payload: unknown): MentorItem[] =>
     .filter((mentor): mentor is MentorItem => Boolean(mentor?.name));
 
 export const fetchMentors = async (signal?: AbortSignal) => {
-  const response = await fetch(API_ENDPOINTS.mentors, { signal });
+  const response = await fetchWithRetry(API_ENDPOINTS.mentors, { signal });
 
   if (!response.ok) {
     throw new Error(`Mentors request failed with ${response.status}`);
@@ -325,6 +383,31 @@ export type PublicationSubmissionPayload = {
     url: string;
     publicId: string;
   }[];
+};
+
+export type NewsRecord = {
+  _id: string;
+  title: string;
+  description: string;
+  thumbNailImage: string;
+  images: string[];
+  date: string;
+  content: string;
+  author: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type NewsSubmissionPayload = {
+  title: string;
+  description: string;
+  thumbNailImage: string;
+  images: string[];
+  date: string;
+  content: string;
+  author: string;
+  thumbNailImageFile?: File | null;
+  imageFiles?: File[];
 };
 
 const readErrorMessage = async (response: Response, fallback: string) => {
@@ -400,6 +483,104 @@ export const submitPublication = (
   signal?: AbortSignal,
 ) => submitJson(API_ENDPOINTS.publicationSubmit, payload, signal);
 
+const getNewsRecords = (payload: unknown): unknown[] => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && typeof payload === "object") {
+    const record = payload as ApiRecord;
+    const wrappedList = record.news ?? record.data ?? record.items ?? record.results;
+
+    if (Array.isArray(wrappedList)) {
+      return wrappedList;
+    }
+  }
+
+  return [];
+};
+
+const normalizeNewsRecords = (payload: unknown): NewsRecord[] =>
+  getNewsRecords(payload)
+    .map<NewsRecord | null>((item) => {
+      if (!item || typeof item !== "object") {
+        return null;
+      }
+
+      const record = item as ApiRecord;
+      const id = readString(record, ["_id", "id"]);
+      const images = Array.isArray(record.images)
+        ? record.images.filter((image): image is string => typeof image === "string")
+        : [];
+
+      if (!id) {
+        return null;
+      }
+
+      return {
+        _id: id,
+        title: readString(record, ["title"]),
+        description: readString(record, ["description"]),
+        thumbNailImage: readString(record, ["thumbNailImage", "thumbnailImage"]),
+        images,
+        date: readString(record, ["date"]),
+        content: readString(record, ["content"]),
+        author: readString(record, ["author"]),
+        createdAt: readString(record, ["createdAt"]),
+        updatedAt: readString(record, ["updatedAt"]),
+      };
+    })
+    .filter((news): news is NewsRecord => Boolean(news));
+
+export const fetchNews = async (signal?: AbortSignal) => {
+  const response = await fetchWithRetry(API_ENDPOINTS.news, { signal });
+
+  if (!response.ok) {
+    throw new Error(`News request failed with ${response.status}`);
+  }
+
+  return normalizeNewsRecords(await response.json());
+};
+
+export const submitNews = async (
+  payload: NewsSubmissionPayload,
+  signal?: AbortSignal,
+) => {
+  const formData = new FormData();
+
+  formData.append("title", payload.title);
+  formData.append("description", payload.description);
+  formData.append("date", payload.date);
+  formData.append("content", payload.content);
+  formData.append("author", payload.author);
+
+  if (payload.thumbNailImageFile) {
+    formData.append("thumbNailImage", payload.thumbNailImageFile);
+  } else if (payload.thumbNailImage) {
+    formData.append("thumbNailImage", payload.thumbNailImage);
+  }
+
+  if (payload.images.length > 0) {
+    formData.append("images", payload.images.join(","));
+  }
+
+  payload.imageFiles?.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  const response = await fetch(API_ENDPOINTS.news, {
+    method: "POST",
+    body: formData,
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, `News submission failed with ${response.status}`));
+  }
+
+  return response.json() as Promise<{ message: string; data: NewsRecord }>;
+};
+
 export const parsePublicationDate = (date: string) => {
   const parsedDate = new Date(date);
 
@@ -418,4 +599,86 @@ export const parsePublicationDate = (date: string) => {
   }
 
   return new Date();
+};
+
+export const getPageContent = async (
+  signal?: AbortSignal,
+): Promise<EditableContent> => {
+  const response = await fetchWithRetry(API_ENDPOINTS.content, { signal });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch page content: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { data: EditableContent };
+  return payload.data;
+};
+
+export const updatePageContent = async (
+  content: EditableContent,
+  signal?: AbortSignal,
+): Promise<EditableContent> => {
+  const {
+    hero,
+    about,
+    researchTitle,
+    researchFields,
+    awardsTitle,
+    awardsStandardLabel,
+    awardsSmallLabel,
+    awards,
+    awardsNote,
+    regulationsTitle,
+    regulationsSubtitle,
+    regulations,
+    newsTitle,
+    newsSubtitle,
+    newsReadAllLabel,
+    milestonesTitle,
+    milestonesNote,
+    milestones,
+    publicationsHome,
+    workshops,
+    footer,
+  } = content;
+
+  const response = await fetch(API_ENDPOINTS.content, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      hero,
+      about,
+      researchTitle,
+      researchFields,
+      awardsTitle,
+      awardsStandardLabel,
+      awardsSmallLabel,
+      awards,
+      awardsNote,
+      regulationsTitle,
+      regulationsSubtitle,
+      regulations,
+      newsTitle,
+      newsSubtitle,
+      newsReadAllLabel,
+      milestonesTitle,
+      milestonesNote,
+      milestones,
+      publicationsHome,
+      workshops,
+      footer,
+    }),
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await readErrorMessage(response, `Failed to update page content: ${response.status}`),
+    );
+  }
+
+  const payload = (await response.json()) as { data: EditableContent };
+  return payload.data;
 };

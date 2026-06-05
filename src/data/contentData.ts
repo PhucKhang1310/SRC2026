@@ -1,4 +1,3 @@
-import { newsData, type NewsItem } from "./newsData";
 
 export type MilestoneItem = {
   id: number;
@@ -119,7 +118,6 @@ export type EditableContent = {
   newsTitle: string;
   newsSubtitle: string;
   newsReadAllLabel: string;
-  news: NewsItem[];
   milestonesTitle: string;
   milestonesNote: string;
   milestones: MilestoneItem[];
@@ -368,7 +366,6 @@ export const defaultContent: EditableContent = {
   newsTitle: "News",
   newsSubtitle: "Latest news about SRC2026",
   newsReadAllLabel: "Read all news",
-  news: newsData,
   milestonesTitle: "MILESTONES",
   milestonesNote:
     "All dates are announced according to the official SRC 2026 schedule from FPT University HCMC.",
@@ -499,7 +496,7 @@ const readStoredContent = (): Partial<EditableContent> => {
         typeof parsed.newsReadAllLabel === "string"
           ? parsed.newsReadAllLabel
           : undefined,
-      news: Array.isArray(parsed.news) ? (parsed.news as NewsItem[]) : undefined,
+
       milestonesTitle:
         typeof parsed.milestonesTitle === "string"
           ? parsed.milestonesTitle

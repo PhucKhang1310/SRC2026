@@ -4,11 +4,13 @@ import ResearchAccordion from "./ResearchAccordion";
 import ResearchCarousel from "./ResearchCarousel";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import ResearchFieldsMobile from "./ResearchFieldMobile";
-import { useEditableContent } from "../../hook/useEditableContent";
+import { usePageContent } from "../../hook/usePageContent";
 
 const ResearchFields = () => {
   const { isMobile } = useCheckMobile();
-  const { researchTitle, researchFields } = useEditableContent();
+  const { content } = usePageContent();
+  const researchTitle = content?.researchTitle ?? "";
+  const researchFields = content?.researchFields ?? [];
   const [activeField, setActiveField] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const { inView, ref } = useFadeIn();
@@ -37,6 +39,10 @@ const ResearchFields = () => {
       setActiveField(index);
     }
   };
+
+  if (!content) {
+    return null;
+  }
 
   if (isMobile) {
     return (

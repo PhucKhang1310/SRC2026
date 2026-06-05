@@ -1,4 +1,4 @@
-import { useEditableContent } from "../../hook/useEditableContent";
+import { usePageContent } from "../../hook/usePageContent";
 
 const CheckIcon = () => (
   <svg
@@ -16,7 +16,13 @@ const CheckIcon = () => (
 );
 
 const Milestones = () => {
-  const { milestones, milestonesNote, milestonesTitle } = useEditableContent();
+  const { content } = usePageContent();
+
+  if (!content) {
+    return null;
+  }
+
+  const { milestones, milestonesNote, milestonesTitle } = content;
 
   return (
     <>

@@ -1,8 +1,13 @@
-import { useEditableContent } from "../../hook/useEditableContent";
+import { usePageContent } from "../../hook/usePageContent";
 
 const Regulations = () => {
-  const { regulationsTitle, regulationsSubtitle, regulations } =
-    useEditableContent();
+  const { content } = usePageContent();
+
+  if (!content) {
+    return null;
+  }
+
+  const { regulationsTitle, regulationsSubtitle, regulations } = content;
 
   return (
     <section
