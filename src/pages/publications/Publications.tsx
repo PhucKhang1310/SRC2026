@@ -5,6 +5,7 @@ import { fetchPublications, parsePublicationDate } from "../../api/api";
 import type { PublicationItem } from "../../data/publicationsData";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import { usePageContent } from "../../hook/usePageContent";
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const fallbackPublicationsHome = {
   eyebrow: "Latest Posts",
@@ -53,6 +54,10 @@ const Publications = () => {
     return () => controller.abort();
   }, []);
 
+  if (isLoading) {
+    return <LoadingPage label="Loading publications" />;
+  }
+
   return (
     <section
       id="publications"
@@ -64,11 +69,7 @@ const Publications = () => {
         </p>
       </div>
 
-      {isLoading ? (
-        <p className="py-12 text-center text-black/60">
-          Loading publications...
-        </p>
-      ) : error ? (
+      {error ? (
         <p className="w-4/5 rounded border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </p>

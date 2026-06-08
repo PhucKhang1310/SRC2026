@@ -16,6 +16,7 @@ import type {
   WorkshopItem,
 } from "../../data/contentData";
 import { useUser } from "../../hook/useUser";
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const dateFormatter = new Intl.DateTimeFormat("vi-VN");
 const inputClass =
@@ -163,6 +164,10 @@ const AdminPage = () => {
     return <Navigate to="/auth/login" replace />;
   }
 
+  if (isContentLoading || isNewsLoading) {
+    return <LoadingPage label="Loading admin content" />;
+  }
+
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-amber-50">
       <section className="mx-auto max-w-6xl">
@@ -212,9 +217,7 @@ const AdminPage = () => {
         {contentError ? <ErrorMessage>{contentError}</ErrorMessage> : null}
         {saveMessage ? <SuccessMessage>{saveMessage}</SuccessMessage> : null}
 
-        {isContentLoading ? (
-          <LoadingMessage>Loading page content...</LoadingMessage>
-        ) : content ? (
+        {content ? (
           <>
             <HeroSection
               content={content}
@@ -261,7 +264,7 @@ const AdminPage = () => {
               }
             >
               {newsError ? <ErrorMessage>{newsError}</ErrorMessage> : null}
-              <NewsList news={latestNews} isLoading={isNewsLoading} />
+              <NewsList news={latestNews} />
             </AdminSection>
             <PublicationsPreviewSection
               content={content}
@@ -280,7 +283,9 @@ const AdminPage = () => {
             />
           </>
         ) : (
-          <LoadingMessage>No page content was returned.</LoadingMessage>
+          <p className="py-12 text-center text-sm text-amber-50/60">
+            No page content was returned.
+          </p>
         )}
 
 
@@ -867,10 +872,8 @@ const FooterSection = ({ content, isEditing, updateContent }: EditableSectionPro
 );
 
 const NewsList = ({
-  isLoading,
   news,
 }: {
-  isLoading: boolean;
   news: NewsRecord[];
 }) => (
   <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900">
@@ -881,9 +884,7 @@ const NewsList = ({
       <span className="hidden md:block">Date</span>
     </div>
 
-    {isLoading ? (
-      <p className="px-4 py-10 text-center text-sm text-slate-400">Loading news...</p>
-    ) : news.length === 0 ? (
+    {news.length === 0 ? (
       <p className="px-4 py-10 text-center text-sm text-slate-400">
         No news articles found.
       </p>
@@ -1044,10 +1045,6 @@ const SuccessMessage = ({ children }: { children: ReactNode }) => (
   <div className="mt-6 rounded-md border border-emerald-500/40 bg-emerald-950/50 px-4 py-3 text-sm text-emerald-100">
     {children}
   </div>
-);
-
-const LoadingMessage = ({ children }: { children: ReactNode }) => (
-  <p className="py-12 text-center text-sm text-amber-50/60">{children}</p>
 );
 
 export default AdminPage;

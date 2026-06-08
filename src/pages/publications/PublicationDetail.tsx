@@ -5,6 +5,7 @@ import { fetchPublicationById, parsePublicationDate } from "../../api/api";
 import type { PublicationItem } from "../../data/publicationsData";
 import NavBar from "../../components/navbar/NavBar";
 import Footer from "../../components/navbar/NavBar";
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const sanitizePublicationHtml = (html: string) =>
   html
@@ -55,6 +56,10 @@ const PublicationDetail = () => {
     [publication]
   );
 
+  if (isLoading) {
+    return <LoadingPage label="Loading publication" />;
+  }
+
   return (
     <main className="min-h-screen bg-black text-amber-50">
       <NavBar />
@@ -68,19 +73,13 @@ const PublicationDetail = () => {
           Back to publications
         </button>
 
-        {isLoading && (
-          <div className="py-16 text-center text-sm text-amber-50/50">
-            Loading publication...
-          </div>
-        )}
-
-        {!isLoading && fetchError && (
+        {fetchError && (
           <div className="py-16 text-center text-sm text-amber-50/50">
             {fetchError}
           </div>
         )}
 
-        {!isLoading && publication && (
+        {publication && (
           <article className="mt-8">
             <img
               src={publication.image}

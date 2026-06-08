@@ -20,6 +20,7 @@ import {
   FaListUl,
 } from "react-icons/fa6";
 import type { IconType } from "react-icons";
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const departmentIcons: Record<string, IconType> = {
   "All": FaListUl,
@@ -63,7 +64,9 @@ const Mentor = () => {
         setMentors([]);
         setFetchError("Unable to load live mentor data.");
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -107,6 +110,10 @@ const Mentor = () => {
     return filteredMentors.slice(start, start + pageSize);
   }, [filteredMentors, currentPage]);
 
+  if (isLoading) {
+    return <LoadingPage label="Loading mentors" />;
+  }
+
   return (
     <main className="min-h-screen bg-black px-6 text-amber-50 lg:px-10">
       <NavBar />
@@ -123,9 +130,9 @@ const Mentor = () => {
             supporting research, creativity, and presentation quality across
             every field in the competition.
           </p>
-          {(isLoading || fetchError) && (
+          {fetchError && (
             <p className="mt-4 text-sm text-amber-50/55">
-              {isLoading ? "Loading live mentor data..." : fetchError}
+              {fetchError}
             </p>
           )}
         </div>

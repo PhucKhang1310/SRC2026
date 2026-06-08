@@ -11,7 +11,7 @@ import { usePageContent } from "../../hook/usePageContent";
 
 const Hero = () => {
   const { isMobile } = useCheckMobile()
-  const { content, loading, error } = usePageContent();
+  const { content, error } = usePageContent();
   const hero = content?.hero;
   const registrationDeadline = hero?.registrationDeadline;
   const [totalSeconds, setTotalSeconds] = useState(0);
@@ -30,10 +30,6 @@ const Hero = () => {
 
     return () => window.clearInterval(timer);
   }, [registrationDeadline]);
-
-  if (loading) {
-    return <section id="home" className="min-h-screen bg-black" />;
-  }
 
   if (error || !hero) {
     return (

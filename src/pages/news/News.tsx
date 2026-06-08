@@ -5,6 +5,7 @@ import { fetchNews, type NewsRecord } from "../../api/api";
 import fptLogo from "../../assets/fpt_logo.jpg";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import { usePageContent } from "../../hook/usePageContent";
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const getNewsImage = (newsItem: NewsRecord) =>
   newsItem.thumbNailImage || newsItem.images[0] || fptLogo;
@@ -49,6 +50,10 @@ const News = () => {
     return null;
   }
 
+  if (isLoading) {
+    return <LoadingPage label="Loading news" />;
+  }
+
   return (
     <section
       id="news"
@@ -61,9 +66,7 @@ const News = () => {
         </div>
       </div>
 
-      {isLoading ? (
-        <p className="py-12 text-center text-black/60">Loading news...</p>
-      ) : error ? (
+      {error ? (
         <p className="w-4/5 rounded border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </p>

@@ -6,15 +6,18 @@ import { useUser } from "../../hook/useUser";
 
 const Login = () => {
     const [errorMessage, setErrorMessage] = React.useState("");
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
     const navigate = useNavigate();
     const { login: loginUser } = useUser();
 
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (isSubmitting) return;
 
         const email = event.currentTarget.email.value;
         const password = event.currentTarget.password.value;
 
+        setIsSubmitting(true);
         login(email, password)
             .then((response) => {
                 setErrorMessage("");
@@ -24,6 +27,9 @@ const Login = () => {
             .catch((error) => {
                 console.error("Login failed:", error);
                 setErrorMessage("Login failed: " + (error instanceof Error ? error.message : "Unknown error"));
+            })
+            .finally(() => {
+                setIsSubmitting(false);
             });
     };
 
@@ -52,8 +58,10 @@ const Login = () => {
                         <input
                             type="email"
                             id="email"
+                            name="email"
                             placeholder="your.email@example.com"
                             className="bg-black border border-white/20 rounded-lg p-3 text-white placeholder-white/30 focus:outline-none focus:border-[#ff6a1f] focus:ring-1 focus:ring-[#ff6a1f] transition-all"
+                            disabled={isSubmitting}
                         />
                     </div>
 
@@ -64,8 +72,10 @@ const Login = () => {
                         <input
                             type="password"
                             id="password"
+                            name="password"
                             placeholder="Your password..."
                             className="bg-black border border-white/20 rounded-lg p-3 text-white placeholder-white/30 focus:outline-none focus:border-[#ff6a1f] focus:ring-1 focus:ring-[#ff6a1f] transition-all"
+                            disabled={isSubmitting}
                         />
                     </div>
 
@@ -77,9 +87,15 @@ const Login = () => {
 
                     <button
                         type="submit"
-                        className="w-full bg-[#f27255] hover:bg-[#e65c3b] text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-colors duration-300 mt-4 cursor-pointer"
+                        className="btn mt-4 w-full border-0 bg-[#f27255] px-4 py-3 font-semibold text-white shadow-md transition-colors duration-300 hover:bg-[#e65c3b]"
+                        disabled={isSubmitting}
+                        aria-busy={isSubmitting}
                     >
-                        Sign In
+                        {isSubmitting ? (
+                            <span className="loading loading-spinner loading-sm" />
+                        ) : (
+                            "Sign In"
+                        )}
                     </button>
                     {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
                 </form>

@@ -6,6 +6,7 @@ import fptLogo from "../../assets/fpt_logo.jpg";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import Footer from "../../components/footer/Footer";
 import Navbar from "../../components/navbar/NavBar";
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const getNewsImage = (item: NewsRecord) =>
   item.thumbNailImage || item.images[0] || fptLogo;
@@ -52,6 +53,10 @@ const NewsDetail = () => {
     [id, news],
   );
 
+  if (isLoading) {
+    return <LoadingPage label="Loading news article" />;
+  }
+
   return (
     <main className="min-h-screen bg-black p-6 text-amber-50">
       <Navbar />
@@ -65,9 +70,7 @@ const NewsDetail = () => {
           Back
         </button>
 
-        {isLoading ? (
-          <p className="py-12 text-amber-50/70">Loading news...</p>
-        ) : error ? (
+        {error ? (
           <p className="mt-6 rounded border border-red-500/40 bg-red-950/40 px-4 py-3 text-sm text-red-100">
             {error}
           </p>

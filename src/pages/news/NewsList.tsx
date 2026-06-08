@@ -7,6 +7,7 @@ import { useCheckMobile } from "../../hook/useCheckMobile";
 // import Footer from "../footer/Footer";
 import NavBar from "../../components/navbar/NavBar";
 import Pagination from "../../components/pagination/Pagination";
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const NewsList = () => {
     const navigate = useNavigate();
@@ -58,6 +59,10 @@ const NewsList = () => {
         navigate("/home#news");
     };
 
+    if (isLoading) {
+        return <LoadingPage label="Loading news" />;
+    }
+
     return (
         <main className="min-h-screen bg-black text-amber-50">
             <NavBar />
@@ -84,9 +89,7 @@ const NewsList = () => {
                 )}
 
                 <div className="grid grid-cols-1 gap-x-4 gap-y-16 p-6 md:grid-cols-2 lg:grid-cols-3">
-                    {isLoading ? (
-                        <p className="col-span-full py-12 text-center text-white/70">Loading news...</p>
-                    ) : newsItems.length > 0 ? (
+                    {newsItems.length > 0 ? (
                         newsItems.map((newsItem) => (
                             <a
                                 key={newsItem._id}

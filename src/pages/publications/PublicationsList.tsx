@@ -7,16 +7,7 @@ import Pagination from "../../components/pagination/Pagination";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCheckMobile } from "../../hook/useCheckMobile";
-
-const PublicationSkeleton = () => (
-  <article className="py-5">
-    <div className="flex w-full flex-col gap-4">
-      <div className="skeleton h-4 w-full bg-amber-50/15"></div>
-      <div className="skeleton h-4 w-full bg-amber-50/15"></div>
-      <div className="skeleton h-4 w-full bg-amber-50/15"></div>
-    </div>
-  </article>
-);
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const PublicationsList = () => {
   const pageSize = 8;
@@ -83,59 +74,43 @@ const PublicationsList = () => {
     setCurrentPage(page);
   };
 
+  if (isLoading) {
+    return <LoadingPage label="Loading publications" />;
+  }
+
   return (
     <main className="min-h-screen bg-black text-amber-50">
       <NavBar />
       <section className="mx-auto w-4/5 max-w-5xl pt-36 pb-16">
         {/* Back button */}
         <div>
-          {isLoading ? (
-            <div className="skeleton h-4 w-20 bg-amber-50/15"></div>
-          ) : (
-            <button
-              onClick={() => navigate("/home#publications")}
-              className="text-md flex items-center gap-2 cursor-pointer text-amber-50/70 hover:text-amber-50 transition-colors"
-            >
-              <FaArrowLeft size={16} />
-              Back
-            </button>
-          )}
+          <button
+            onClick={() => navigate("/home#publications")}
+            className="text-md flex items-center gap-2 cursor-pointer text-amber-50/70 hover:text-amber-50 transition-colors"
+          >
+            <FaArrowLeft size={16} />
+            Back
+          </button>
         </div>
 
         {/* Header */}
         <div className="mt-6 mb-10 text-center">
-          {isLoading ? (
-            <div className="mx-auto flex max-w-md flex-col items-center gap-4">
-              <div className="skeleton h-4 w-full bg-amber-50/15"></div>
-              <div className="skeleton h-4 w-full bg-amber-50/15"></div>
-            </div>
-          ) : (
-            <>
-              <h1 className="text-3xl font-black uppercase tracking-wider text-[#ff6a1f] md:text-4xl">
-                Publications
-              </h1>
-              <p className="mt-3 text-sm text-amber-50/50">
-                Published research papers from SRC competitions
-              </p>
-            </>
-          )}
+          <h1 className="text-3xl font-black uppercase tracking-wider text-[#ff6a1f] md:text-4xl">
+            Publications
+          </h1>
+          <p className="mt-3 text-sm text-amber-50/50">
+            Published research papers from SRC competitions
+          </p>
         </div>
 
         {/* Publication list */}
         <div className="divide-y divide-amber-50/10">
-          {isLoading && (
-            <>
-              {Array.from({ length: pageSize }, (_, index) => (
-                <PublicationSkeleton key={index} />
-              ))}
-            </>
-          )}
-          {!isLoading && fetchError && (
+          {fetchError && (
             <div className="py-10 text-center text-sm text-amber-50/50">
               {fetchError}
             </div>
           )}
-          {!isLoading && !fetchError && items.length === 0 && (
+          {!fetchError && items.length === 0 && (
             <div className="py-10 text-center text-sm text-amber-50/50">
               No publications are available.
             </div>

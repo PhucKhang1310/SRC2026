@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getPageContent } from "../api/api";
 import type { EditableContent } from "../data/contentData";
 import { PageContentContext } from "./pageContentContextValue";
+import LoadingPage from "../components/loading/LoadingPage";
 
 export const PageContentProvider = ({
     children,
@@ -24,6 +25,10 @@ export const PageContentProvider = ({
 
         return () => controller.abort();
     }, []);
+
+    if (loading) {
+        return <LoadingPage label="Loading page content" />;
+    }
 
     return (
         <PageContentContext value={{ content, loading, error }}>

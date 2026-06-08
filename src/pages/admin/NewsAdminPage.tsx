@@ -3,6 +3,7 @@ import { FaArrowLeft, FaPlus, FaRotateRight } from "react-icons/fa6";
 import { Navigate, useNavigate } from "react-router-dom";
 import { fetchNews, type NewsRecord } from "../../api/api";
 import { useUser } from "../../hook/useUser";
+import LoadingPage from "../../components/loading/LoadingPage";
 
 const NewsAdminPage = () => {
   const { user } = useUser();
@@ -35,6 +36,10 @@ const NewsAdminPage = () => {
 
   if (!user) {
     return <Navigate to="/auth/login" replace />;
+  }
+
+  if (isLoading) {
+    return <LoadingPage label="Loading news admin" />;
   }
 
   return (
@@ -90,9 +95,7 @@ const NewsAdminPage = () => {
             <span className="hidden md:block">Date</span>
           </div>
 
-          {isLoading ? (
-            <p className="px-4 py-10 text-center text-sm text-slate-400">Loading news...</p>
-          ) : news.length === 0 ? (
+          {news.length === 0 ? (
             <p className="px-4 py-10 text-center text-sm text-slate-400">No news articles found.</p>
           ) : (
             news.map((item) => (
