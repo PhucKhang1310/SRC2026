@@ -130,7 +130,7 @@ const News = () => {
                 </p>
               </a>
 
-              <div className="flex flex-1 flex-col justify-between p-2 pt-0">
+              <div className="flex flex-1 flex-col justify-between p-2 pt-0 gap-3">
                 {news.slice(1, 4).map((newsItem) => (
                   <a
                     key={`news-item-${newsItem._id}`}

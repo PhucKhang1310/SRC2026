@@ -7,6 +7,7 @@ import {
 } from "../../api/api";
 import Footer from "../../components/footer/Footer";
 import NavBar from "../../components/navbar/NavBar";
+import TurnstileWidget from "../../components/turnstile/TurnstileWidget";
 
 const inputClass =
   "w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-amber-50 outline-none transition placeholder:text-amber-50/30 focus:border-[#ff6a1f] focus:ring-2 focus:ring-[#ff6a1f]/20";
@@ -41,6 +42,8 @@ const PublicationSubmission = () => {
   const [imagesText, setImagesText] = useState("");
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
   const payload = useMemo<PublicationSubmissionPayload>(
     () => ({
@@ -55,7 +58,8 @@ const PublicationSubmission = () => {
     payload.author &&
     payload.publishDate &&
     payload.content &&
-    payload.authorGmail,
+    payload.authorGmail &&
+    turnstileToken,
   );
 
   const updateField = (
@@ -74,10 +78,12 @@ const PublicationSubmission = () => {
 
       setIsSubmitting(true);
       setStatus("");
-      await submitPublication(payload);
+      await submitPublication({ ...payload, turnstileToken });
       setStatus("Publication submission sent.");
       setForm(initialForm);
       setImagesText("");
+      setTurnstileToken("");
+      setTurnstileResetKey((current) => current + 1);
     } catch (error) {
       setStatus(
         error instanceof Error ? error.message : "Publication submission failed.",
@@ -168,6 +174,15 @@ const PublicationSubmission = () => {
                 value={imagesText}
                 onChange={(value) => {
                   setImagesText(value);
+                  setStatus("");
+                }}
+              />
+            </div>
+            <div className="md:col-span-2">
+              <TurnstileWidget
+                resetKey={turnstileResetKey}
+                onTokenChange={(token) => {
+                  setTurnstileToken(token);
                   setStatus("");
                 }}
               />

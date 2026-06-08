@@ -5,6 +5,8 @@ import type { EditableContent } from "../data/contentData";
 const API_BASE_URL =
   import.meta.env.VITE_TEST_API_BASE_URL?.replace(/\/+$/, "") ??
   "https://src2026backendmain.vercel.app/api/v1";
+// "http://localhost:3000/api/v1";
+
 
 export const API_ENDPOINTS = {
   mentors: `${API_BASE_URL}/mentor`,
@@ -344,7 +346,9 @@ const submitJson = async <Payload>(
   });
 
   if (!response.ok) {
-    throw new Error(`Submission failed with ${response.status}`);
+    throw new Error(
+      await readErrorMessage(response, `Submission failed with ${response.status}`),
+    );
   }
 
   const contentType = response.headers.get("content-type");
@@ -369,6 +373,7 @@ export type MentorSubmissionPayload = {
   researchTopics: string;
   note: string;
   avatarImage: string;
+  turnstileToken?: string;
 };
 
 export type PublicationSubmissionPayload = {
@@ -383,6 +388,7 @@ export type PublicationSubmissionPayload = {
     url: string;
     publicId: string;
   }[];
+  turnstileToken?: string;
 };
 
 export type NewsRecord = {
