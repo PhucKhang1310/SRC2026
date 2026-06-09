@@ -1,6 +1,9 @@
 import type { MentorItem } from "../data/mentorData";
 import type { PublicationItem } from "../data/publicationsData";
-import type { EditableContent } from "../data/contentData";
+import {
+  normalizeEditableContent,
+  type EditableContent,
+} from "../data/contentData";
 
 const API_BASE_URL =
   import.meta.env.VITE_TEST_API_BASE_URL?.replace(/\/+$/, "") ??
@@ -13,6 +16,7 @@ export const API_ENDPOINTS = {
   mentorSubmit: `${API_BASE_URL}/mentor/submit`,
   news: `${API_BASE_URL}/news`,
   content: `${API_BASE_URL}/content`,
+  contentVersions: `${API_BASE_URL}/content/versions`,
   publications: `${API_BASE_URL}/publication`,
   publicationSubmit: `${API_BASE_URL}/publication/submit`,
   signup: `${API_BASE_URL}/auth/signup`,
@@ -617,7 +621,7 @@ export const getPageContent = async (
   }
 
   const payload = (await response.json()) as { data: EditableContent };
-  return payload.data;
+  return normalizeEditableContent(payload.data);
 };
 
 export const updatePageContent = async (
@@ -646,6 +650,7 @@ export const updatePageContent = async (
     publicationsHome,
     workshops,
     footer,
+    layout,
   } = content;
 
   const response = await fetch(API_ENDPOINTS.content, {
@@ -675,6 +680,7 @@ export const updatePageContent = async (
       publicationsHome,
       workshops,
       footer,
+      layout,
     }),
     signal,
   });
@@ -686,5 +692,93 @@ export const updatePageContent = async (
   }
 
   const payload = (await response.json()) as { data: EditableContent };
-  return payload.data;
+  return normalizeEditableContent(payload.data);
+};
+
+export type ContentVersionSummary = {
+  id: string;
+  label: string;
+  createdAt: string;
+  content?: EditableContent;
+};
+
+const normalizeContentVersion = (value: unknown): ContentVersionSummary | null => {
+  if (!value || typeof value !== "object") return null;
+
+  const record = value as ApiRecord;
+  const id = readString(record, ["_id", "id", "versionId"]);
+  if (!id) return null;
+
+  const createdAt =
+    readString(record, ["createdAt", "date", "timestamp"]) ||
+    new Date().toISOString();
+  const label =
+    readString(record, ["label", "name", "title"]) ||
+    `Version ${new Date(createdAt).toLocaleString()}`;
+  const rawContent = record.content ?? record.snapshot ?? record.data;
+
+  return {
+    id,
+    label,
+    createdAt,
+    content:
+      rawContent && typeof rawContent === "object"
+        ? normalizeEditableContent(rawContent as Partial<EditableContent>)
+        : undefined,
+  };
+};
+
+const getContentVersionRecords = (payload: unknown): unknown[] => {
+  if (Array.isArray(payload)) return payload;
+  if (!payload || typeof payload !== "object") return [];
+
+  const record = payload as ApiRecord;
+  const wrapped = record.versions ?? record.data ?? record.items ?? record.results;
+  return Array.isArray(wrapped) ? wrapped : [];
+};
+
+export const fetchContentVersions = async (signal?: AbortSignal) => {
+  const response = await fetchWithRetry(API_ENDPOINTS.contentVersions, { signal });
+
+  if (!response.ok) {
+    throw new Error(
+      await readErrorMessage(response, `Failed to load content versions: ${response.status}`),
+    );
+  }
+
+  return getContentVersionRecords(await response.json())
+    .map(normalizeContentVersion)
+    .filter((version): version is ContentVersionSummary => Boolean(version));
+};
+
+export const createContentVersion = async (
+  label: string,
+  content: EditableContent,
+  signal?: AbortSignal,
+) => {
+  const response = await fetch(API_ENDPOINTS.contentVersions, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ label, content }),
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await readErrorMessage(response, `Failed to save content version: ${response.status}`),
+    );
+  }
+
+  const payload = await response.json();
+  const version = normalizeContentVersion(payload);
+  if (version) return version;
+
+  const nestedVersion = normalizeContentVersion((payload as { data?: unknown }).data);
+  if (!nestedVersion) {
+    throw new Error("Content version response was not usable.");
+  }
+
+  return nestedVersion;
 };

@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
+import type { ReactNode } from "react";
 import AboutUs from "./components/about/AboutUs";
 import Awards from "./components/awards/Awards";
 import Footer from "./components/footer/Footer";
@@ -11,8 +12,33 @@ import News from "./pages/news/News";
 import Publications from "./pages/publications/Publications";
 import Workshops from "./components/workshops/Workshops";
 import LazyWrapper from "./components/wrapper/LazyWrapper";
+import { usePageContent } from "./hook/usePageContent";
+import {
+  defaultPageLayout,
+  type PageSectionKind,
+} from "./data/contentData";
+
+const sectionComponents: Record<PageSectionKind, () => ReactNode> = {
+  hero: () => <Hero />,
+  about: () => <AboutUs />,
+  research: () => <ResearchFields />,
+  awards: () => <Awards />,
+  regulations: () => <Regulations />,
+  milestones: () => <Milestones />,
+  news: () => <News />,
+  publications: () => <Publications />,
+  workshops: () => (
+    <LazyWrapper id="workshops">
+      <Workshops />
+    </LazyWrapper>
+  ),
+  footer: () => <Footer />,
+};
 
 const App = () => {
+  const { content } = usePageContent();
+  const layout = content?.layout ?? defaultPageLayout;
+
   useEffect(() => {
     const scrollToHash = () => {
       const hash = window.location.hash;
@@ -56,18 +82,13 @@ const App = () => {
   return (
     <>
       <NavBar />
-      <Hero />
-      <AboutUs />
-      <ResearchFields />
-      <Awards />
-      <Regulations />
-      <Milestones />
-      <News />
-      <Publications />
-      <LazyWrapper id="workshops">
-        <Workshops />
-      </LazyWrapper>
-      <Footer />
+      {layout
+        .filter((section) => section.enabled)
+        .map((section) => (
+          <Fragment key={section.id}>
+            {sectionComponents[section.id]()}
+          </Fragment>
+        ))}
     </>
   );
 };

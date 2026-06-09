@@ -102,7 +102,38 @@ export type FooterContent = {
   rightsLine: string;
 };
 
+export type PageSectionKind =
+  | "hero"
+  | "about"
+  | "research"
+  | "awards"
+  | "regulations"
+  | "milestones"
+  | "news"
+  | "publications"
+  | "workshops"
+  | "footer";
+
+export type PageLayoutSection = {
+  id: PageSectionKind;
+  enabled: boolean;
+};
+
+export const defaultPageLayout: PageLayoutSection[] = [
+  { id: "hero", enabled: true },
+  { id: "about", enabled: true },
+  { id: "research", enabled: true },
+  { id: "awards", enabled: true },
+  { id: "regulations", enabled: true },
+  { id: "milestones", enabled: true },
+  { id: "news", enabled: true },
+  { id: "publications", enabled: true },
+  { id: "workshops", enabled: true },
+  { id: "footer", enabled: true },
+];
+
 export type EditableContent = {
+  layout: PageLayoutSection[];
   hero: HeroContent;
   about: AboutContent;
   researchTitle: string;
@@ -129,6 +160,7 @@ export type EditableContent = {
 export const contentStorageKey = "resfes2026-editable-content";
 
 export const defaultContent: EditableContent = {
+  layout: defaultPageLayout,
   hero: {
     titleLines: ["STUDENT", "RESEARCH", "COMPETITION", "2026"],
     taglinePrimary: "RBL in Action, Researchers Ready",
@@ -431,6 +463,44 @@ export const defaultContent: EditableContent = {
   },
 };
 
+export const normalizePageLayout = (
+  layout?: PageLayoutSection[],
+): PageLayoutSection[] => {
+  const incoming = Array.isArray(layout) ? layout : [];
+  const knownIds = new Set(defaultPageLayout.map((section) => section.id));
+  const normalized = incoming
+    .filter((section): section is PageLayoutSection =>
+      Boolean(section && knownIds.has(section.id)),
+    )
+    .map((section) => ({
+      id: section.id,
+      enabled: section.enabled !== false,
+    }));
+
+  for (const section of defaultPageLayout) {
+    if (!normalized.some((item) => item.id === section.id)) {
+      normalized.push(section);
+    }
+  }
+
+  return normalized;
+};
+
+export const normalizeEditableContent = (
+  content: Partial<EditableContent>,
+): EditableContent => ({
+  ...defaultContent,
+  ...content,
+  layout: normalizePageLayout(content.layout),
+  hero: { ...defaultContent.hero, ...content.hero },
+  about: { ...defaultContent.about, ...content.about },
+  publicationsHome: {
+    ...defaultContent.publicationsHome,
+    ...content.publicationsHome,
+  },
+  footer: { ...defaultContent.footer, ...content.footer },
+});
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === "object";
 
@@ -451,6 +521,9 @@ const readStoredContent = (): Partial<EditableContent> => {
     }
 
     return {
+      layout: Array.isArray(parsed.layout)
+        ? (parsed.layout as PageLayoutSection[])
+        : undefined,
       hero: isRecord(parsed.hero) ? (parsed.hero as HeroContent) : undefined,
       about: isRecord(parsed.about) ? (parsed.about as AboutContent) : undefined,
       researchTitle:
@@ -523,10 +596,8 @@ const readStoredContent = (): Partial<EditableContent> => {
   }
 };
 
-export const getEditableContent = (): EditableContent => ({
-  ...defaultContent,
-  ...readStoredContent(),
-});
+export const getEditableContent = (): EditableContent =>
+  normalizeEditableContent(readStoredContent());
 
 export const saveEditableContent = (content: EditableContent) => {
   window.localStorage.setItem(contentStorageKey, JSON.stringify(content));

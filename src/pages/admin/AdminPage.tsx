@@ -1,16 +1,30 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { FaArrowRight, FaFloppyDisk, FaPen, FaRotateRight, FaXmark } from "react-icons/fa6";
+import {
+  FaArrowRight,
+  FaClockRotateLeft,
+  FaEye,
+  FaFloppyDisk,
+  FaPen,
+  FaPlus,
+  FaRotateRight,
+  FaTrash,
+  FaXmark,
+} from "react-icons/fa6";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
+  createContentVersion,
   fetchNews,
+  fetchContentVersions,
   getPageContent,
   updatePageContent,
+  type ContentVersionSummary,
   type NewsRecord,
 } from "../../api/api";
 import type {
   AwardCommittee,
   AwardTier,
   EditableContent,
+  PageSectionKind,
   RegulationSection,
   ResearchFieldItem,
   WorkshopItem,
@@ -23,6 +37,19 @@ const inputClass =
   "w-full rounded-lg border border-white/15 bg-black px-3 py-2 text-sm text-amber-50 outline-none transition placeholder:text-amber-50/30 focus:border-[#ff6a1f] focus:ring-2 focus:ring-[#ff6a1f]/20";
 const labelClass =
   "text-xs font-semibold uppercase tracking-wider text-amber-50/55";
+
+const sectionLabels: Record<PageSectionKind, string> = {
+  hero: "Hero",
+  about: "About",
+  research: "Research Fields",
+  awards: "Awards",
+  regulations: "Regulations",
+  milestones: "Milestones",
+  news: "News",
+  publications: "Publications Preview",
+  workshops: "Workshop",
+  footer: "Footer",
+};
 
 const getNewsTime = (item: NewsRecord) => {
   const date = new Date(item.date || item.createdAt || item.updatedAt || "");
@@ -55,6 +82,10 @@ const AdminPage = () => {
   const [contentError, setContentError] = useState("");
   const [newsError, setNewsError] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
+  const [versions, setVersions] = useState<ContentVersionSummary[]>([]);
+  const [versionsError, setVersionsError] = useState("");
+  const [selectedVersion, setSelectedVersion] =
+    useState<ContentVersionSummary | null>(null);
   const lastScrollY = useRef(0);
 
   const latestNews = useMemo(
@@ -65,6 +96,59 @@ const AdminPage = () => {
   const updateContent = (updater: (current: EditableContent) => EditableContent) => {
     setContent((current) => (current ? updater(current) : current));
     setSaveMessage("");
+  };
+
+  const updateLayout = (
+    updater: (layout: EditableContent["layout"]) => EditableContent["layout"],
+  ) => {
+    updateContent((current) => ({
+      ...current,
+      layout: updater(current.layout),
+    }));
+  };
+
+  const moveLayoutSection = (sectionId: PageSectionKind, direction: -1 | 1) => {
+    updateLayout((layout) => {
+      const nextLayout = [...layout];
+      const currentIndex = nextLayout.findIndex((section) => section.id === sectionId);
+      const nextIndex = currentIndex + direction;
+
+      if (currentIndex < 0 || nextIndex < 0 || nextIndex >= nextLayout.length) {
+        return layout;
+      }
+
+      [nextLayout[currentIndex], nextLayout[nextIndex]] = [
+        nextLayout[nextIndex],
+        nextLayout[currentIndex],
+      ];
+      return nextLayout;
+    });
+  };
+
+  const setLayoutSectionEnabled = (
+    sectionId: PageSectionKind,
+    enabled: boolean,
+  ) => {
+    updateLayout((layout) =>
+      layout.map((section) =>
+        section.id === sectionId ? { ...section, enabled } : section,
+      ),
+    );
+  };
+
+  const loadVersions = async (signal?: AbortSignal) => {
+    try {
+      setVersionsError("");
+      setVersions(await fetchContentVersions(signal));
+    } catch (loadError) {
+      if (signal?.aborted) return;
+      setVersions([]);
+      setVersionsError(
+        loadError instanceof Error
+          ? loadError.message
+          : "Could not load page history.",
+      );
+    }
   };
 
   const loadContent = async (signal?: AbortSignal) => {
@@ -110,10 +194,27 @@ const AdminPage = () => {
       setIsSaving(true);
       setContentError("");
       setSaveMessage("");
-      setContent(await updatePageContent(content));
+      const savedContent = await updatePageContent(content);
+      setContent(savedContent);
+
+      try {
+        await createContentVersion(
+          `Saved ${new Date().toLocaleString()}`,
+          savedContent,
+        );
+        await loadVersions();
+        setSaveMessage("Page content saved and versioned.");
+      } catch (versionError) {
+        setVersionsError(
+          versionError instanceof Error
+            ? versionError.message
+            : "Could not save page version.",
+        );
+        setSaveMessage("Page content saved. Version history was not updated.");
+      }
+
       setIsEditing(false);
       setIsSaveBarVisible(false);
-      setSaveMessage("Page content saved.");
     } catch (saveError) {
       setContentError(
         saveError instanceof Error
@@ -129,6 +230,7 @@ const AdminPage = () => {
     const controller = new AbortController();
     void loadContent(controller.signal);
     void loadNews(controller.signal);
+    void loadVersions(controller.signal);
 
     return () => controller.abort();
   }, []);
@@ -167,6 +269,106 @@ const AdminPage = () => {
   if (isContentLoading || isNewsLoading) {
     return <LoadingPage label="Loading admin content" />;
   }
+
+  const renderEditableSection = (sectionId: PageSectionKind) => {
+    if (!content) return null;
+
+    switch (sectionId) {
+      case "hero":
+        return (
+          <HeroSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      case "about":
+        return (
+          <AboutSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      case "research":
+        return (
+          <ResearchSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      case "awards":
+        return (
+          <AwardsSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      case "regulations":
+        return (
+          <RegulationsSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      case "milestones":
+        return (
+          <MilestonesSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      case "news":
+        return (
+          <AdminSection
+            title="News"
+            action={
+              <button
+                type="button"
+                onClick={() => navigate("/admin/news")}
+                className="inline-flex items-center gap-2 rounded-lg border border-amber-50/25 px-3 py-2 text-sm font-semibold text-amber-50 transition hover:border-[#ff6a1f] hover:bg-amber-50/10"
+              >
+                Manage news
+                <FaArrowRight />
+              </button>
+            }
+          >
+            {newsError ? <ErrorMessage>{newsError}</ErrorMessage> : null}
+            <NewsList news={latestNews} />
+          </AdminSection>
+        );
+      case "publications":
+        return (
+          <PublicationsPreviewSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      case "workshops":
+        return (
+          <WorkshopSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      case "footer":
+        return (
+          <FooterSection
+            content={content}
+            isEditing={isEditing}
+            updateContent={updateContent}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-amber-50">
@@ -219,67 +421,23 @@ const AdminPage = () => {
 
         {content ? (
           <>
-            <HeroSection
+            <LayoutSection
               content={content}
               isEditing={isEditing}
-              updateContent={updateContent}
+              onAdd={(sectionId) => setLayoutSectionEnabled(sectionId, true)}
+              onMove={moveLayoutSection}
+              onRemove={(sectionId) => setLayoutSectionEnabled(sectionId, false)}
             />
-            <AboutSection
-              content={content}
-              isEditing={isEditing}
-              updateContent={updateContent}
-            />
-            <ResearchSection
-              content={content}
-              isEditing={isEditing}
-              updateContent={updateContent}
-            />
-            <AwardsSection
-              content={content}
-              isEditing={isEditing}
-              updateContent={updateContent}
-            />
-            <RegulationsSection
-              content={content}
-              isEditing={isEditing}
-              updateContent={updateContent}
-            />
-            <MilestonesSection
-              content={content}
-              isEditing={isEditing}
-              updateContent={updateContent}
-            />
-
-            <AdminSection
-              title="News"
-              action={
-                <button
-                  type="button"
-                  onClick={() => navigate("/admin/news")}
-                  className="inline-flex items-center gap-2 rounded-lg border border-amber-50/25 px-3 py-2 text-sm font-semibold text-amber-50 transition hover:border-[#ff6a1f] hover:bg-amber-50/10"
-                >
-                  Manage news
-                  <FaArrowRight />
-                </button>
-              }
-            >
-              {newsError ? <ErrorMessage>{newsError}</ErrorMessage> : null}
-              <NewsList news={latestNews} />
-            </AdminSection>
-            <PublicationsPreviewSection
-              content={content}
-              isEditing={isEditing}
-              updateContent={updateContent}
-            />
-            <WorkshopSection
-              content={content}
-              isEditing={isEditing}
-              updateContent={updateContent}
-            />
-            <FooterSection
-              content={content}
-              isEditing={isEditing}
-              updateContent={updateContent}
+            {content.layout
+              .filter((section) => section.enabled)
+              .map((section) => (
+                <div key={section.id}>{renderEditableSection(section.id)}</div>
+              ))}
+            <HistorySection
+              error={versionsError}
+              onSelectVersion={setSelectedVersion}
+              selectedVersion={selectedVersion}
+              versions={versions}
             />
           </>
         ) : (
@@ -309,6 +467,215 @@ type EditableSectionProps = {
   isEditing: boolean;
   updateContent: ContentUpdater;
 };
+
+type LayoutSectionProps = {
+  content: EditableContent;
+  isEditing: boolean;
+  onAdd: (sectionId: PageSectionKind) => void;
+  onMove: (sectionId: PageSectionKind, direction: -1 | 1) => void;
+  onRemove: (sectionId: PageSectionKind) => void;
+};
+
+const LayoutSection = ({
+  content,
+  isEditing,
+  onAdd,
+  onMove,
+  onRemove,
+}: LayoutSectionProps) => {
+  const enabledSections = content.layout.filter((section) => section.enabled);
+  const disabledSections = content.layout.filter((section) => !section.enabled);
+
+  return (
+    <AdminSection title="Page Layout">
+      <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
+        <ContentCard>
+          <ul className="list">
+            {enabledSections.map((section, index) => (
+              <li
+                key={section.id}
+                className="list-row border-b border-amber-50/10 last:border-b-0"
+              >
+                <div className="list-col-grow">
+                  <div className="font-semibold text-amber-50">
+                    {sectionLabels[section.id]}
+                  </div>
+                  <div className="text-xs text-amber-50/45">
+                    Position {index + 1}
+                  </div>
+                </div>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-xs"
+                    disabled={!isEditing || index === 0}
+                    onClick={() => onMove(section.id, -1)}
+                  >
+                    Up
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-xs"
+                    disabled={!isEditing || index === enabledSections.length - 1}
+                    onClick={() => onMove(section.id, 1)}
+                  >
+                    Down
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-xs text-red-200"
+                    disabled={!isEditing}
+                    onClick={() => onRemove(section.id)}
+                  >
+                    <FaTrash className="size-3" />
+                    Remove
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </ContentCard>
+
+        <ContentCard>
+          <div className="flex items-center gap-2">
+            <FaPlus className="text-[#ff6a1f]" />
+            <h3 className="font-semibold">Add section</h3>
+          </div>
+          {disabledSections.length === 0 ? (
+            <p className="mt-4 text-sm text-amber-50/55">
+              All page sections are active.
+            </p>
+          ) : (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {disabledSections.map((section) => (
+                <button
+                  key={section.id}
+                  type="button"
+                  className="btn btn-outline btn-sm border-amber-50/25 text-amber-50"
+                  disabled={!isEditing}
+                  onClick={() => onAdd(section.id)}
+                >
+                  <FaPlus className="size-3" />
+                  {sectionLabels[section.id]}
+                </button>
+              ))}
+            </div>
+          )}
+          {!isEditing ? (
+            <p className="mt-4 text-xs text-amber-50/40">
+              Enable edit mode to change the page layout.
+            </p>
+          ) : null}
+        </ContentCard>
+      </div>
+    </AdminSection>
+  );
+};
+
+type HistorySectionProps = {
+  error: string;
+  onSelectVersion: (version: ContentVersionSummary) => void;
+  selectedVersion: ContentVersionSummary | null;
+  versions: ContentVersionSummary[];
+};
+
+const HistorySection = ({
+  error,
+  onSelectVersion,
+  selectedVersion,
+  versions,
+}: HistorySectionProps) => (
+  <AdminSection title="History">
+    <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
+      <ContentCard>
+        <div className="flex items-center gap-2">
+          <FaClockRotateLeft className="text-[#ff6a1f]" />
+          <h3 className="font-semibold">Saved versions</h3>
+        </div>
+        {error ? <ErrorMessage>{error}</ErrorMessage> : null}
+        {!error && versions.length === 0 ? (
+          <p className="mt-4 text-sm text-amber-50/55">
+            No saved page versions were returned by the database.
+          </p>
+        ) : (
+          <div className="mt-4 grid gap-2">
+            {versions.map((version) => (
+              <button
+                key={version.id}
+                type="button"
+                className={`btn justify-start border-amber-50/15 bg-zinc-950 text-left text-amber-50 hover:border-[#ff6a1f] ${
+                  selectedVersion?.id === version.id ? "border-[#ff6a1f]" : ""
+                }`}
+                onClick={() => onSelectVersion(version)}
+              >
+                <FaEye className="size-4 shrink-0" />
+                <span className="min-w-0 truncate">{version.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </ContentCard>
+
+      <ContentCard>
+        {selectedVersion ? (
+          <VersionPreview version={selectedVersion} />
+        ) : (
+          <p className="text-sm text-amber-50/55">
+            Select a saved version to view a previous competition page layout.
+          </p>
+        )}
+      </ContentCard>
+    </div>
+  </AdminSection>
+);
+
+const VersionPreview = ({ version }: { version: ContentVersionSummary }) => {
+  const content = version.content;
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="badge badge-outline border-[#ff6a1f] text-[#ff6a1f]">
+          {new Date(version.createdAt).toLocaleString()}
+        </span>
+        <h3 className="text-lg font-semibold">{version.label}</h3>
+      </div>
+      {content ? (
+        <div className="mt-5 grid gap-5">
+          <div>
+            <p className={labelClass}>Section order</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {content.layout
+                .filter((section) => section.enabled)
+                .map((section) => (
+                  <span key={section.id} className="badge badge-ghost">
+                    {sectionLabels[section.id]}
+                  </span>
+                ))}
+            </div>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <ReadOnlyMetric label="Hero" value={content.hero.titleLines.join(" ")} />
+            <ReadOnlyMetric label="About" value={content.about.title} />
+            <ReadOnlyMetric label="Research Fields" value={String(content.researchFields.length)} />
+            <ReadOnlyMetric label="Milestones" value={String(content.milestones.length)} />
+          </div>
+        </div>
+      ) : (
+        <p className="mt-5 text-sm text-amber-50/55">
+          This version did not include an inspectable content snapshot.
+        </p>
+      )}
+    </div>
+  );
+};
+
+const ReadOnlyMetric = ({ label, value }: { label: string; value: string }) => (
+  <div className="rounded border border-amber-50/10 bg-black p-3">
+    <p className={labelClass}>{label}</p>
+    <p className="mt-1 line-clamp-2 text-sm text-amber-50/80">{value}</p>
+  </div>
+);
 
 const HeroSection = ({ content, isEditing, updateContent }: EditableSectionProps) => (
   <AdminSection title="Hero">

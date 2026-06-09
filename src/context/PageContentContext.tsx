@@ -21,7 +21,11 @@ export const PageContentProvider = ({
             .catch((error: Error) => {
                 if (error.name !== "AbortError") setError(error.message);
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
+            });
 
         return () => controller.abort();
     }, []);
