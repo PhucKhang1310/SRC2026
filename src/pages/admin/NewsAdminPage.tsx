@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaArrowLeft, FaPlus, FaRotateRight } from "react-icons/fa6";
 import { Navigate, useNavigate } from "react-router-dom";
-import { fetchNews, type NewsRecord } from "../../api/api";
+import { fetchNews, type NewsRecord } from "../../api/newsApi";
 import { useUser } from "../../hook/useUser";
 import LoadingPage from "../../components/loading/LoadingPage";
 

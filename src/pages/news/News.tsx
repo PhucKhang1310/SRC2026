@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import { fetchNews, type NewsRecord } from "../../api/api";
+import { fetchNews, type NewsRecord } from "../../api/newsApi";
 import fptLogo from "../../assets/fpt_logo.jpg";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import { usePageContent } from "../../hook/usePageContent";

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { FaArrowLeft, FaFloppyDisk } from "react-icons/fa6";
 import { Navigate, useNavigate } from "react-router-dom";
-import { submitNews } from "../../api/api";
+import { submitNews } from "../../api/newsApi";
 import { useUser } from "../../hook/useUser";
 
 const inputClass =

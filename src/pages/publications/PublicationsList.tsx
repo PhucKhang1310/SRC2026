@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchPublications, parsePublicationDate } from "../../api/api";
+import { fetchPublications, parsePublicationDate } from "../../api/publicationApi";
 import type { PublicationItem } from "../../data/publicationsData";
 import NavBar from "../../components/navbar/NavBar";
 import Footer from "../../components/navbar/NavBar";

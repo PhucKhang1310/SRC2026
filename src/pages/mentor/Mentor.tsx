@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import MentorList from "./MentorList";
-import { fetchMentors } from "../../api/api";
+import { fetchMentors } from "../../api/mentorApi";
 import type { MentorItem } from "../../data/mentorData";
 import Pagination from "../../components/pagination/Pagination";
 import NavBar from "../../components/navbar/NavBar";

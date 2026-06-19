@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaArrowLeft, FaPaperPlane } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import { submitMentor, type MentorSubmissionPayload } from "../../api/api";
+import { submitMentor, type MentorSubmissionPayload } from "../../api/mentorApi";
 import Footer from "../../components/footer/Footer";
 import NavBar from "../../components/navbar/NavBar";
 import TurnstileWidget from "../../components/turnstile/TurnstileWidget";

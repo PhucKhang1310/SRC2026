@@ -11,15 +11,14 @@ import {
   FaXmark,
 } from "react-icons/fa6";
 import { Navigate, useNavigate } from "react-router-dom";
+import { fetchNews, type NewsRecord } from "../../api/newsApi";
 import {
   createContentVersion,
-  fetchNews,
   fetchContentVersions,
   getPageContent,
   updatePageContent,
   type ContentVersionSummary,
-  type NewsRecord,
-} from "../../api/api";
+} from "../../api/pageContentApi";
 import type {
   AwardCommittee,
   AwardTier,

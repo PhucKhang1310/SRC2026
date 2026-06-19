@@ -1,7 +1,7 @@
 import { useState, type FormEvent, useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
-import { callEmailSignup } from "../../api/api";
+import { callEmailSignup } from "../../api/authApi";
 
 const SignUp = () => {
   const navigate = useNavigate();

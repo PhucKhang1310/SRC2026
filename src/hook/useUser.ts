@@ -6,7 +6,7 @@ import React, {
   useState,
   type PropsWithChildren,
 } from "react";
-import { getCurrentUser, type CurrentUser } from "../api/api";
+import { getCurrentUser, type CurrentUser } from "../api/authApi";
 
 type UserContextValue = {
   user: CurrentUser | null;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa6";
-import { fetchPublications, parsePublicationDate } from "../../api/api";
+import { fetchPublications, parsePublicationDate } from "../../api/publicationApi";
 import type { PublicationItem } from "../../data/publicationsData";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import { usePageContent } from "../../hook/usePageContent";

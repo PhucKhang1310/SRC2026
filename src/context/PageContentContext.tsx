@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPageContent } from "../api/api";
+import { getPageContent } from "../api/pageContentApi";
 import type { EditableContent } from "../data/contentData";
 import { PageContentContext } from "./pageContentContextValue";
 import LoadingPage from "../components/loading/LoadingPage";

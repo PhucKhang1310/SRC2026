@@ -1,89 +1,133 @@
-const API_BASE_URL =
-    import.meta.env.VITE_TEST_API_BASE_URL?.replace(/\/+$/, "") ??
-    "https://src2026backendmain.vercel.app/api/v1";
-// "http://localhost:3000/api/v1";
+import {
+  API_ENDPOINTS,
+  fetchWithRetry,
+  readErrorMessage,
+  readString,
+  type ApiRecord,
+} from "./apiClient";
 
-type ApiRecord = Record<string, unknown>;
-
-export type NewsApiItem = {
-    _id: string;
-    title: string;
-    description: string;
-    thumbNailImage: string;
-    images: string[];
-    date: string;
-    content: string;
-    author: string;
+export type NewsRecord = {
+  _id: string;
+  title: string;
+  description: string;
+  thumbNailImage: string;
+  images: string[];
+  date: string;
+  content: string;
+  author: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
-const readString = (record: ApiRecord, fields: string[], fallback = "") => {
-    for (const field of fields) {
-        const value = record[field];
-        if (typeof value === "string" && value.trim()) {
-            return value.trim();
-        }
-    }
-
-    return fallback;
+export type NewsSubmissionPayload = {
+  title: string;
+  description: string;
+  thumbNailImage: string;
+  images: string[];
+  date: string;
+  content: string;
+  author: string;
+  thumbNailImageFile?: File | null;
+  imageFiles?: File[];
 };
 
 const getNewsRecords = (payload: unknown): unknown[] => {
-    if (Array.isArray(payload)) {
-        return payload;
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && typeof payload === "object") {
+    const record = payload as ApiRecord;
+    const wrappedList = record.news ?? record.data ?? record.items ?? record.results;
+
+    if (Array.isArray(wrappedList)) {
+      return wrappedList;
     }
+  }
 
-    if (payload && typeof payload === "object") {
-        const record = payload as ApiRecord;
-        const wrappedList = record.news ?? record.data ?? record.items ?? record.results;
-
-        if (Array.isArray(wrappedList)) {
-            return wrappedList;
-        }
-    }
-
-    return [];
+  return [];
 };
 
-const normalizeNews = (payload: unknown): NewsApiItem[] =>
-    getNewsRecords(payload)
-        .map<NewsApiItem | null>((item) => {
-            if (!item || typeof item !== "object") {
-                return null;
-            }
+const normalizeNewsRecords = (payload: unknown): NewsRecord[] =>
+  getNewsRecords(payload)
+    .map<NewsRecord | null>((item) => {
+      if (!item || typeof item !== "object") {
+        return null;
+      }
 
-            const record = item as ApiRecord;
-            const id = readString(record, ["_id", "id"]);
-            const images = Array.isArray(record.images)
-                ? record.images.filter((image): image is string => typeof image === "string")
-                : [];
+      const record = item as ApiRecord;
+      const id = readString(record, ["_id", "id"]);
+      const images = Array.isArray(record.images)
+        ? record.images.filter((image): image is string => typeof image === "string")
+        : [];
 
-            if (!id) {
-                return null;
-            }
+      if (!id) {
+        return null;
+      }
 
-            return {
-                _id: id,
-                title: readString(record, ["title"], "Untitled news"),
-                description: readString(record, ["description"]),
-                thumbNailImage: readString(record, ["thumbNailImage", "thumbnailImage"]),
-                images,
-                date: readString(record, ["date", "createdAt"], new Date().toISOString()),
-                content: readString(record, ["content"]),
-                author: readString(record, ["author"], "SRC Committee"),
-            };
-        })
-        .filter((news): news is NewsApiItem => Boolean(news));
+      return {
+        _id: id,
+        title: readString(record, ["title"]),
+        description: readString(record, ["description"]),
+        thumbNailImage: readString(record, ["thumbNailImage", "thumbnailImage"]),
+        images,
+        date: readString(record, ["date"]),
+        content: readString(record, ["content"]),
+        author: readString(record, ["author"]),
+        createdAt: readString(record, ["createdAt"]),
+        updatedAt: readString(record, ["updatedAt"]),
+      };
+    })
+    .filter((news): news is NewsRecord => Boolean(news));
 
-export const getNews = async (signal?: AbortSignal): Promise<NewsApiItem[]> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/news`, { signal });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+export const fetchNews = async (signal?: AbortSignal) => {
+  const response = await fetchWithRetry(API_ENDPOINTS.news, { signal });
 
-        return normalizeNews(await response.json());
-    } catch (error) {
-        console.error("Error fetching news:", error);
-        throw error;
-    }
+  if (!response.ok) {
+    throw new Error(`News request failed with ${response.status}`);
+  }
+
+  return normalizeNewsRecords(await response.json());
+};
+
+export const getNews = fetchNews;
+
+export const submitNews = async (
+  payload: NewsSubmissionPayload,
+  signal?: AbortSignal,
+) => {
+  const formData = new FormData();
+
+  formData.append("title", payload.title);
+  formData.append("description", payload.description);
+  formData.append("date", payload.date);
+  formData.append("content", payload.content);
+  formData.append("author", payload.author);
+
+  if (payload.thumbNailImageFile) {
+    formData.append("thumbNailImage", payload.thumbNailImageFile);
+  } else if (payload.thumbNailImage) {
+    formData.append("thumbNailImage", payload.thumbNailImage);
+  }
+
+  if (payload.images.length > 0) {
+    formData.append("images", payload.images.join(","));
+  }
+
+  payload.imageFiles?.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  const response = await fetch(API_ENDPOINTS.news, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, `News submission failed with ${response.status}`));
+  }
+
+  return response.json() as Promise<{ message: string; data: NewsRecord }>;
 };

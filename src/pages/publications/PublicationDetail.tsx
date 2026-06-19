@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
-import { fetchPublicationById, parsePublicationDate } from "../../api/api";
+import { fetchPublicationById, parsePublicationDate } from "../../api/publicationApi";
 import type { PublicationItem } from "../../data/publicationsData";
 import NavBar from "../../components/navbar/NavBar";
 import Footer from "../../components/navbar/NavBar";

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   submitPublication,
   type PublicationSubmissionPayload,
-} from "../../api/api";
+} from "../../api/publicationApi";
 import Footer from "../../components/footer/Footer";
 import NavBar from "../../components/navbar/NavBar";
 import TurnstileWidget from "../../components/turnstile/TurnstileWidget";

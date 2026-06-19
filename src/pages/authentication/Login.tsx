@@ -1,7 +1,7 @@
 import React from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../api/api";
+import { login } from "../../api/authApi";
 import { useUser } from "../../hook/useUser";
 
 const Login = () => {
