@@ -21,11 +21,139 @@ export const API_ENDPOINTS = {
   publicationSubmit: `${API_BASE_URL}/publication/submit`,
   signup: `${API_BASE_URL}/auth/signup`,
   login: `${API_BASE_URL}/auth/login`,
+  me: `${API_BASE_URL}/auth/me`,
+  logout: `${API_BASE_URL}/auth/logout`,
 } as const;
 
 type ApiRecord = Record<string, unknown>;
 
 const retryableStatuses = new Set([408, 429, 500, 502, 503, 504]);
+const PAGE_CONTENT_CACHE_NAME = "resfes-page-content-v1";
+const PAGE_CONTENT_CACHE_KEY = "resfes-page-content";
+const PAGE_CONTENT_CACHE_TTL = 5 * 60 * 1000;
+
+type PageContentCacheEntry = {
+  data: EditableContent;
+  cachedAt: number;
+};
+
+let pageContentMemoryCache: PageContentCacheEntry | null = null;
+
+const isPageContentCacheFresh = (entry: PageContentCacheEntry) =>
+  Date.now() - entry.cachedAt < PAGE_CONTENT_CACHE_TTL;
+
+const isPageContentCacheEntry = (
+  value: unknown,
+): value is PageContentCacheEntry =>
+  Boolean(
+    value &&
+    typeof value === "object" &&
+    "data" in value &&
+    "cachedAt" in value &&
+    typeof (value as PageContentCacheEntry).cachedAt === "number",
+  );
+
+const getPageContentCacheRequest = () =>
+  new Request(API_ENDPOINTS.content, { method: "GET" });
+
+const writePageContentCacheStorage = async (cacheEntry: PageContentCacheEntry) => {
+  if (!("caches" in window)) {
+    return;
+  }
+
+  const cache = await window.caches.open(PAGE_CONTENT_CACHE_NAME);
+  await cache.put(
+    getPageContentCacheRequest(),
+    new Response(JSON.stringify(cacheEntry), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }),
+  );
+};
+
+const readPageContentCacheStorage = async () => {
+  if (!("caches" in window)) {
+    return null;
+  }
+
+  const cache = await window.caches.open(PAGE_CONTENT_CACHE_NAME);
+  const response = await cache.match(getPageContentCacheRequest());
+  if (!response) {
+    return null;
+  }
+
+  const parsedCache = (await response.json()) as unknown;
+  if (!isPageContentCacheEntry(parsedCache) || !isPageContentCacheFresh(parsedCache)) {
+    await cache.delete(getPageContentCacheRequest());
+    return null;
+  }
+
+  return parsedCache;
+};
+
+const readCachedPageContent = async () => {
+  if (pageContentMemoryCache && isPageContentCacheFresh(pageContentMemoryCache)) {
+    return normalizeEditableContent(pageContentMemoryCache.data);
+  }
+
+  try {
+    const cachedEntry = await readPageContentCacheStorage();
+    if (cachedEntry) {
+      pageContentMemoryCache = cachedEntry;
+      return normalizeEditableContent(cachedEntry.data);
+    }
+  } catch {
+    // Fall back to localStorage if Cache Storage is unavailable or unreadable.
+  }
+
+  try {
+    const cachedValue = window.localStorage.getItem(PAGE_CONTENT_CACHE_KEY);
+    if (!cachedValue) return null;
+
+    const parsedCache = JSON.parse(cachedValue) as unknown;
+    if (!isPageContentCacheEntry(parsedCache) || !isPageContentCacheFresh(parsedCache)) {
+      window.localStorage.removeItem(PAGE_CONTENT_CACHE_KEY);
+      pageContentMemoryCache = null;
+      return null;
+    }
+
+    pageContentMemoryCache = parsedCache;
+    try {
+      await writePageContentCacheStorage(parsedCache);
+    } catch {
+      // Cache Storage backfill is optional when localStorage is already valid.
+    }
+    return normalizeEditableContent(parsedCache.data);
+  } catch {
+    return null;
+  }
+};
+
+const writeCachedPageContent = async (data: EditableContent) => {
+  const cacheEntry = {
+    data,
+    cachedAt: Date.now(),
+  };
+
+  pageContentMemoryCache = cacheEntry;
+
+  try {
+    window.localStorage.setItem(PAGE_CONTENT_CACHE_KEY, JSON.stringify(cacheEntry));
+  } catch {
+    // localStorage may be unavailable or full; the in-memory cache still works.
+  }
+
+  try {
+    if (!("caches" in window)) {
+      return;
+    }
+
+    await writePageContentCacheStorage(cacheEntry);
+  } catch {
+    // Cache Storage may be unavailable; memory/localStorage cache still works.
+  }
+};
 
 const delay = (milliseconds: number, signal?: AbortSignal) =>
   new Promise<void>((resolve, reject) => {
@@ -420,6 +548,12 @@ export type NewsSubmissionPayload = {
   imageFiles?: File[];
 };
 
+export type CurrentUser = {
+  id: string;
+  email: string;
+  role: string;
+};
+
 const readErrorMessage = async (response: Response, fallback: string) => {
   const contentType = response.headers.get("content-type");
 
@@ -464,6 +598,7 @@ export const login = async (
 ) => {
   const response = await fetch(API_ENDPOINTS.login, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -480,7 +615,43 @@ export const login = async (
     );
   }
 
-  return response.json() as Promise<{ token: string }>;
+  return response.json() as Promise<{ message: string; user: CurrentUser }>;
+};
+
+export const getCurrentUser = async (signal?: AbortSignal) => {
+  const response = await fetch(API_ENDPOINTS.me, {
+    credentials: "include",
+    signal,
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      return null;
+    }
+
+    throw new Error(
+      await readErrorMessage(response, `Could not check login status: ${response.status}`),
+    );
+  }
+
+  const payload = (await response.json()) as { user: CurrentUser };
+  return payload.user;
+};
+
+export const logout = async (signal?: AbortSignal) => {
+  const response = await fetch(API_ENDPOINTS.logout, {
+    method: "POST",
+    credentials: "include",
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      await readErrorMessage(response, `Logout failed with ${response.status}`),
+    );
+  }
+
+  return response.json() as Promise<{ message: string }>;
 };
 
 export const submitMentor = (
@@ -580,6 +751,7 @@ export const submitNews = async (
 
   const response = await fetch(API_ENDPOINTS.news, {
     method: "POST",
+    credentials: "include",
     body: formData,
     signal,
   });
@@ -613,7 +785,15 @@ export const parsePublicationDate = (date: string) => {
 
 export const getPageContent = async (
   signal?: AbortSignal,
+  options: { forceRefresh?: boolean } = {},
 ): Promise<EditableContent> => {
+  if (!options.forceRefresh) {
+    const cachedContent = await readCachedPageContent();
+    if (cachedContent) {
+      return cachedContent;
+    }
+  }
+
   const response = await fetchWithRetry(API_ENDPOINTS.content, { signal });
 
   if (!response.ok) {
@@ -621,7 +801,9 @@ export const getPageContent = async (
   }
 
   const payload = (await response.json()) as { data: EditableContent };
-  return normalizeEditableContent(payload.data);
+  const normalizedContent = normalizeEditableContent(payload.data);
+  await writeCachedPageContent(normalizedContent);
+  return normalizedContent;
 };
 
 export const updatePageContent = async (
@@ -655,6 +837,7 @@ export const updatePageContent = async (
 
   const response = await fetch(API_ENDPOINTS.content, {
     method: "PUT",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -692,7 +875,9 @@ export const updatePageContent = async (
   }
 
   const payload = (await response.json()) as { data: EditableContent };
-  return normalizeEditableContent(payload.data);
+  const normalizedContent = normalizeEditableContent(payload.data);
+  await writeCachedPageContent(normalizedContent);
+  return normalizedContent;
 };
 
 export type ContentVersionSummary = {
@@ -760,6 +945,7 @@ export const createContentVersion = async (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "credentials": "include",
     },
     body: JSON.stringify({ label, content }),
     signal,

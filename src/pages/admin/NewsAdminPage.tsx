@@ -6,7 +6,7 @@ import { useUser } from "../../hook/useUser";
 import LoadingPage from "../../components/loading/LoadingPage";
 
 const NewsAdminPage = () => {
-  const { user } = useUser();
+  const { user, isLoading: isUserLoading } = useUser();
   const navigate = useNavigate();
   const [news, setNews] = useState<NewsRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +33,16 @@ const NewsAdminPage = () => {
 
     return () => controller.abort();
   }, []);
+
+  if (isUserLoading) {
+    return (
+      <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
+        <p className="py-12 text-center text-sm text-slate-400">
+          Checking login status...
+        </p>
+      </main>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/auth/login" replace />;

@@ -1,33 +1,56 @@
 import React, {
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type PropsWithChildren,
 } from "react";
+import { getCurrentUser, type CurrentUser } from "../api/api";
 
 type UserContextValue = {
-  user: string | null;
-  login: (token: string) => void;
+  user: CurrentUser | null;
+  isLoading: boolean;
+  login: (user: CurrentUser) => void;
 };
-
-const userTokenStorageKey = "resfes-user-token";
 
 const UserContext = React.createContext<UserContextValue | undefined>(
   undefined,
 );
 
 const UserProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<string | null>(() =>
-    window.sessionStorage.getItem(userTokenStorageKey),
-  );
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = useCallback((token: string) => {
-    window.sessionStorage.setItem(userTokenStorageKey, token);
-    setUser(token);
+  useEffect(() => {
+    window.sessionStorage.removeItem("resfes-user-token");
+
+    const controller = new AbortController();
+
+    getCurrentUser(controller.signal)
+      .then(setUser)
+      .catch((error: Error) => {
+        if (error.name !== "AbortError") {
+          setUser(null);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => controller.abort();
   }, []);
 
-  const contextValue = useMemo(() => ({ user, login }), [user, login]);
+  const login = useCallback((user: CurrentUser) => {
+    setUser(user);
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({ user, isLoading, login }),
+    [user, isLoading, login],
+  );
 
   return React.createElement(UserContext.Provider, {
     value: contextValue,

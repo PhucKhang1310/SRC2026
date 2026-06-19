@@ -12,7 +12,7 @@ const labelClass =
   "text-xs font-semibold uppercase tracking-wider text-amber-50/60";
 
 const PostNews = () => {
-  const { user } = useUser();
+  const { user, isLoading: isUserLoading } = useUser();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -34,6 +34,16 @@ const PostNews = () => {
       }
     };
   }, [thumbnailPreviewUrl]);
+
+  if (isUserLoading) {
+    return (
+      <main className="min-h-screen bg-black text-amber-50">
+        <p className="py-32 text-center text-sm text-amber-50/60">
+          Checking login status...
+        </p>
+      </main>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/auth/login" replace />;

@@ -16,7 +16,7 @@ const textToUrls = (value: string) =>
     .filter(Boolean);
 
 const NewsUploadAdminPage = () => {
-  const { user } = useUser();
+  const { user, isLoading: isUserLoading } = useUser();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -29,6 +29,16 @@ const NewsUploadAdminPage = () => {
   const [author, setAuthor] = useState("");
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (isUserLoading) {
+    return (
+      <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
+        <p className="py-12 text-center text-sm text-slate-400">
+          Checking login status...
+        </p>
+      </main>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/auth/login" replace />;

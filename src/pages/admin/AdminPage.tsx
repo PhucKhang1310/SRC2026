@@ -70,7 +70,7 @@ const textToList = (value: string) =>
     .filter(Boolean);
 
 const AdminPage = () => {
-  const { user } = useUser();
+  const { user, isLoading: isUserLoading } = useUser();
   const navigate = useNavigate();
   const [content, setContent] = useState<EditableContent | null>(null);
   const [news, setNews] = useState<NewsRecord[]>([]);
@@ -155,7 +155,7 @@ const AdminPage = () => {
     try {
       setIsContentLoading(true);
       setContentError("");
-      setContent(await getPageContent(signal));
+      setContent(await getPageContent(signal, { forceRefresh: true }));
     } catch (loadError) {
       if (signal?.aborted) return;
       setContentError(
@@ -261,6 +261,10 @@ const AdminPage = () => {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isEditing]);
+
+  if (isUserLoading) {
+    return <LoadingPage label="Checking login status" />;
+  }
 
   if (!user) {
     return <Navigate to="/auth/login" replace />;

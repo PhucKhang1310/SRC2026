@@ -21,7 +21,7 @@ const Login = () => {
         login(email, password)
             .then((response) => {
                 setErrorMessage("");
-                loginUser(response.token);
+                loginUser(response.user);
                 navigate("/admin");
             })
             .catch((error) => {
