@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaArrowLeft, FaPlus, FaRotateRight } from "react-icons/fa6";
+import { FaArrowLeft, FaPen, FaPlus, FaRotateRight } from "react-icons/fa6";
 import { Navigate, useNavigate } from "react-router-dom";
 import { fetchNews, type NewsRecord } from "../../api/newsApi";
 import { useUser } from "../../hook/useUser";
@@ -98,11 +98,12 @@ const NewsAdminPage = () => {
         )}
 
         <div className="overflow-hidden rounded-lg border border-slate-800 bg-slate-900">
-          <div className="grid grid-cols-[96px_1fr] gap-4 border-b border-slate-800 px-4 py-3 text-xs font-semibold uppercase text-slate-500 md:grid-cols-[120px_1fr_180px_140px]">
+          <div className="grid grid-cols-[96px_1fr] gap-4 border-b border-slate-800 px-4 py-3 text-xs font-semibold uppercase text-slate-500 md:grid-cols-[120px_1fr_180px_140px_120px]">
             <span>Image</span>
             <span>Title</span>
             <span className="hidden md:block">Author</span>
             <span className="hidden md:block">Date</span>
+            <span className="hidden md:block">Actions</span>
           </div>
 
           {news.length === 0 ? (
@@ -111,7 +112,7 @@ const NewsAdminPage = () => {
             news.map((item) => (
               <article
                 key={item._id}
-                className="grid grid-cols-[96px_1fr] gap-4 border-b border-slate-800 px-4 py-4 last:border-b-0 md:grid-cols-[120px_1fr_180px_140px] md:items-center"
+                className="grid grid-cols-[96px_1fr] gap-4 border-b border-slate-800 px-4 py-4 last:border-b-0 md:grid-cols-[120px_1fr_180px_140px_120px] md:items-center"
               >
                 <img
                   src={item.thumbNailImage}
@@ -130,6 +131,14 @@ const NewsAdminPage = () => {
                 <span className="hidden text-sm text-slate-400 md:block">
                   {new Date(item.date).toLocaleDateString("vi-VN")}
                 </span>
+                <button
+                  type="button"
+                  className="inline-flex w-fit items-center gap-2 rounded-md border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-orange-500 hover:bg-slate-800"
+                  onClick={() => navigate(`/admin/news/${item._id}/edit`)}
+                >
+                  <FaPen />
+                  Edit
+                </button>
               </article>
             ))
           )}
