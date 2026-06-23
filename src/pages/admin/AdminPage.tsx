@@ -4,6 +4,7 @@ import {
   FaClockRotateLeft,
   FaEye,
   FaFloppyDisk,
+  FaInbox,
   FaPen,
   FaPlus,
   FaRotateRight,
@@ -389,6 +390,14 @@ const AdminPage = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/admin/submissions")}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-50/25 px-4 py-2 text-sm font-semibold text-amber-50 transition hover:border-[#ff6a1f] hover:bg-amber-50/10 cursor-pointer"
+            >
+              <FaInbox />
+              Review submissions
+            </button>
             <button
               type="button"
               onClick={() => {

@@ -5,11 +5,13 @@ const API_BASE_URL =
 export const API_ENDPOINTS = {
   mentors: `${API_BASE_URL}/mentor`,
   mentorSubmit: `${API_BASE_URL}/mentor/submit`,
+  pendingMentors: `${API_BASE_URL}/mentor/pending`,
   news: `${API_BASE_URL}/news`,
   content: `${API_BASE_URL}/content`,
   contentVersions: `${API_BASE_URL}/content/versions`,
   publications: `${API_BASE_URL}/publication`,
   publicationSubmit: `${API_BASE_URL}/publication/submit`,
+  pendingPublications: `${API_BASE_URL}/publication/pending`,
   signup: `${API_BASE_URL}/auth/signup`,
   login: `${API_BASE_URL}/auth/login`,
   me: `${API_BASE_URL}/auth/me`,
