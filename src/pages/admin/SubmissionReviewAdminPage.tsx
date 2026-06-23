@@ -38,6 +38,7 @@ const stripHtml = (value: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
+
 const SubmissionReviewAdminPage = () => {
   const { user, isLoading: isUserLoading } = useUser();
   const navigate = useNavigate();
@@ -98,10 +99,6 @@ const SubmissionReviewAdminPage = () => {
 
   if (!user) {
     return <Navigate to="/auth/login" replace />;
-  }
-
-  if (user.role !== "admin") {
-    return <Navigate to="/home" replace />;
   }
 
   if (isLoading) {
@@ -270,18 +267,16 @@ const QueueTab = ({
 }) => (
   <button
     type="button"
-    className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${
-      active
-        ? "bg-orange-600 text-white"
-        : "border border-slate-700 text-slate-300 hover:border-slate-500 hover:bg-slate-900"
-    }`}
+    className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${active
+      ? "bg-orange-600 text-white"
+      : "border border-slate-700 text-slate-300 hover:border-slate-500 hover:bg-slate-900"
+      }`}
     onClick={onClick}
   >
     {label}
     <span
-      className={`rounded px-2 py-0.5 text-xs ${
-        active ? "bg-white/15 text-white" : "bg-slate-800 text-slate-300"
-      }`}
+      className={`rounded px-2 py-0.5 text-xs ${active ? "bg-white/15 text-white" : "bg-slate-800 text-slate-300"
+        }`}
     >
       {count}
     </span>
@@ -450,7 +445,7 @@ const InfoLine = ({
       {icon}
       {label}
     </p>
-    <p className="break-words text-slate-300">{value || "-"}</p>
+    <p className="wrap-break-word text-slate-300">{value || "-"}</p>
   </div>
 );
 
@@ -462,11 +457,10 @@ const Alert = ({
   tone: "error" | "success";
 }) => (
   <div
-    className={`mb-6 rounded-md border px-4 py-3 text-sm ${
-      tone === "error"
-        ? "border-red-500/40 bg-red-950/50 text-red-100"
-        : "border-emerald-500/40 bg-emerald-950/50 text-emerald-100"
-    }`}
+    className={`mb-6 rounded-md border px-4 py-3 text-sm ${tone === "error"
+      ? "border-red-500/40 bg-red-950/50 text-red-100"
+      : "border-emerald-500/40 bg-emerald-950/50 text-emerald-100"
+      }`}
   >
     {children}
   </div>
