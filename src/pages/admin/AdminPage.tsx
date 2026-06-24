@@ -86,12 +86,24 @@ const AdminPage = () => {
   const [versionsError, setVersionsError] = useState("");
   const [selectedVersion, setSelectedVersion] =
     useState<ContentVersionSummary | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("layout");
   const lastScrollY = useRef(0);
 
   const latestNews = useMemo(
     () => [...news].sort((a, b) => getNewsTime(b) - getNewsTime(a)).slice(0, 5),
     [news],
   );
+
+  const tabs = useMemo(() => {
+    if (!content) return [];
+    return [
+      { id: "layout", label: "Page Layout" },
+      ...content.layout
+        .filter((s) => s.enabled)
+        .map((s) => ({ id: s.id, label: sectionLabels[s.id] })),
+      { id: "history", label: "History" },
+    ];
+  }, [content]);
 
   const updateContent = (updater: (current: EditableContent) => EditableContent) => {
     setContent((current) => (current ? updater(current) : current));
@@ -381,29 +393,61 @@ const AdminPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-black px-5 py-8 text-amber-50">
-      <section className="mx-auto max-w-6xl">
-        <div className="flex flex-col gap-4 border-b border-amber-50/15 pb-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#ff6a1f]">
-              Admin
-            </p>
-            <h1 className="mt-1 text-3xl font-bold">
-              <a href="/">SRC2026</a>
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-amber-50/60">
-              Review and update public page content from the backend API.
-            </p>
+    <main className="flex h-screen w-full bg-[#050505] text-amber-50 overflow-hidden font-sans">
+      {/* Sidebar */}
+      <aside className="w-64 flex-shrink-0 border-r border-amber-50/10 bg-black overflow-y-auto flex flex-col z-20 shadow-2xl shadow-black">
+        <div className="p-6 border-b border-amber-50/10">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#ff6a1f]">
+            Admin
+          </p>
+          <h1 className="mt-1 text-2xl font-bold bg-gradient-to-r from-amber-50 to-amber-500 bg-clip-text text-transparent">
+            <a href="/">SRC2026</a>
+          </h1>
+          <p className="mt-2 text-xs text-amber-50/50 leading-relaxed">
+            Review and update public page content.
+          </p>
+        </div>
+        <div className="flex-1 p-4 overflow-y-auto">
+          <nav className="flex flex-col gap-1">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`text-left px-4 py-3 rounded-lg text-sm transition-all duration-300 cursor-pointer ${
+                  activeTab === tab.id
+                    ? "bg-gradient-to-r from-[#ff6a1f]/10 to-transparent text-[#ff6a1f] font-semibold border-l-2 border-[#ff6a1f]"
+                    : "text-amber-50/60 hover:bg-amber-50/5 hover:text-amber-50 border-l-2 border-transparent"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div className="p-4 border-t border-amber-50/10 flex flex-col gap-2 bg-black/50 backdrop-blur">
+          <button
+            type="button"
+            onClick={() => navigate("/admin/submissions")}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-amber-50/15 bg-zinc-900/50 px-4 py-2.5 text-sm font-semibold text-amber-50 transition-all hover:border-[#ff6a1f]/50 hover:bg-amber-50/10 cursor-pointer shadow-sm hover:shadow-[#ff6a1f]/20"
+          >
+            <FaInbox />
+            Submissions
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <section className="flex-1 overflow-y-auto relative bg-[#0a0a0a]">
+        {/* Top Sticky Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-amber-50/5 bg-[#0a0a0a]/80 backdrop-blur-md px-6 md:px-10 py-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-[#ff6a1f] animate-pulse" />
+            <h2 className="text-lg font-medium text-amber-50/90 tracking-wide">
+              {tabs.find((t) => t.id === activeTab)?.label || "Dashboard"}
+            </h2>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => navigate("/admin/submissions")}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-50/25 px-4 py-2 text-sm font-semibold text-amber-50 transition hover:border-[#ff6a1f] hover:bg-amber-50/10 cursor-pointer"
-            >
-              <FaInbox />
-              Review submissions
-            </button>
             <button
               type="button"
               onClick={() => {
@@ -412,10 +456,10 @@ const AdminPage = () => {
                 setIsEditing(false);
                 setIsSaveBarVisible(false);
               }}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-50/25 px-4 py-2 text-sm font-semibold text-amber-50 transition hover:border-[#ff6a1f] hover:bg-amber-50/10 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-50/15 px-4 py-2 text-sm font-semibold text-amber-50 transition-all hover:border-[#ff6a1f] hover:bg-[#ff6a1f]/10 cursor-pointer"
             >
-              <FaRotateRight />
-              Refresh
+              <FaRotateRight className="text-amber-50/70" />
+              <span className="hidden sm:inline">Refresh</span>
             </button>
             <button
               type="button"
@@ -426,47 +470,56 @@ const AdminPage = () => {
                   return nextValue;
                 });
               }}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#ff6a1f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#e85f1b] cursor-pointer"
+              className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-all duration-300 shadow-md cursor-pointer ${
+                isEditing 
+                  ? "bg-zinc-800 hover:bg-zinc-700 border border-zinc-600" 
+                  : "bg-gradient-to-r from-[#ff6a1f] to-[#e85f1b] hover:shadow-[#ff6a1f]/30 border border-transparent"
+              }`}
             >
               {isEditing ? <FaXmark /> : <FaPen />}
-              {isEditing ? "Stop editing" : "Edit content"}
+              {isEditing ? "Stop Editing" : "Edit Content"}
             </button>
           </div>
         </div>
 
-        {contentError ? <ErrorMessage>{contentError}</ErrorMessage> : null}
-        {saveMessage ? <SuccessMessage>{saveMessage}</SuccessMessage> : null}
+        <div className="p-6 md:p-10 max-w-5xl mx-auto pb-32">
+          {contentError ? <ErrorMessage>{contentError}</ErrorMessage> : null}
+          {saveMessage ? <SuccessMessage>{saveMessage}</SuccessMessage> : null}
 
-        {content ? (
-          <>
-            <LayoutSection
-              content={content}
-              isEditing={isEditing}
-              onAdd={(sectionId) => setLayoutSectionEnabled(sectionId, true)}
-              onMove={moveLayoutSection}
-              onRemove={(sectionId) => setLayoutSectionEnabled(sectionId, false)}
-            />
-            {content.layout
-              .filter((section) => section.enabled)
-              .map((section) => (
-                <div key={section.id}>{renderEditableSection(section.id)}</div>
-              ))}
-            <HistorySection
-              error={versionsError}
-              onSelectVersion={setSelectedVersion}
-              selectedVersion={selectedVersion}
-              versions={versions}
-            />
-          </>
-        ) : (
-          <p className="py-12 text-center text-sm text-amber-50/60">
-            No page content was returned.
-          </p>
-        )}
-
-
-
+          {content ? (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+              {activeTab === "layout" && (
+                <LayoutSection
+                  content={content}
+                  isEditing={isEditing}
+                  onAdd={(sectionId) => setLayoutSectionEnabled(sectionId, true)}
+                  onMove={moveLayoutSection}
+                  onRemove={(sectionId) => setLayoutSectionEnabled(sectionId, false)}
+                />
+              )}
+              {activeTab === "history" && (
+                <HistorySection
+                  error={versionsError}
+                  onSelectVersion={setSelectedVersion}
+                  selectedVersion={selectedVersion}
+                  versions={versions}
+                />
+              )}
+              {activeTab !== "layout" &&
+                activeTab !== "history" &&
+                renderEditableSection(activeTab as PageSectionKind)}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="h-12 w-12 rounded-full border-2 border-t-[#ff6a1f] border-r-transparent border-b-[#ff6a1f]/30 border-l-transparent animate-spin mb-4" />
+              <p className="text-sm text-amber-50/60 font-medium">
+                Waiting for page content...
+              </p>
+            </div>
+          )}
+        </div>
       </section>
+
       {content ? (
         <SaveBar
           isSaving={isSaving}
@@ -1333,7 +1386,7 @@ type SaveBarProps = {
 
 const SaveBar = ({ isSaving, isVisible, onSave }: SaveBarProps) => (
   <div
-    className={`fixed inset-x-0 bottom-0 z-50 border-t border-amber-50/15 bg-black/90 px-5 py-4 backdrop-blur transition-transform duration-200 ${isVisible ? "translate-y-0" : "translate-y-full"
+    className={`fixed right-0 md:left-64 bottom-0 z-50 border-t border-amber-50/15 bg-black/90 px-5 py-4 backdrop-blur transition-transform duration-200 ${isVisible ? "translate-y-0" : "translate-y-full"
       }`}
   >
     <div className="mx-auto flex max-w-6xl justify-end">
