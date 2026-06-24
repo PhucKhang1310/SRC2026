@@ -6,6 +6,7 @@ import {
   submitJson,
   type ApiRecord,
 } from "./apiClient";
+import { createBrowserCache } from "./browserCache";
 
 export type MentorSubmissionPayload = {
   title: string;
@@ -23,6 +24,8 @@ export type MentorSubmissionPayload = {
   avatarImage: string;
   turnstileToken?: string;
 };
+
+const MENTORS_CACHE_TTL = 5 * 60 * 1000;
 
 const readMentorLinks = (
   record: ApiRecord,
@@ -142,7 +145,27 @@ const normalizeMentors = (payload: unknown): MentorItem[] =>
     })
     .filter((mentor): mentor is MentorItem => Boolean(mentor?.name));
 
-export const fetchMentors = async (signal?: AbortSignal) => {
+const mentorsCache = createBrowserCache<MentorItem[]>({
+  cacheName: "resfes-mentors-v1",
+  normalize: (data) => normalizeMentors(data),
+  requestUrl: API_ENDPOINTS.mentors,
+  storageKey: "resfes-mentors",
+  ttlMs: MENTORS_CACHE_TTL,
+});
+
+export const clearMentorsCache = () => mentorsCache.clear();
+
+export const fetchMentors = async (
+  signal?: AbortSignal,
+  options: { forceRefresh?: boolean } = {},
+) => {
+  if (!options.forceRefresh) {
+    const cachedMentors = await mentorsCache.read();
+    if (cachedMentors) {
+      return cachedMentors;
+    }
+  }
+
   const response = await fetchWithRetry(API_ENDPOINTS.mentors, { signal });
 
   if (!response.ok) {
@@ -155,10 +178,15 @@ export const fetchMentors = async (signal?: AbortSignal) => {
     throw new Error("Mentors response did not contain a usable list");
   }
 
+  await mentorsCache.write(mentors);
   return mentors;
 };
 
 export const submitMentor = (
   payload: MentorSubmissionPayload,
   signal?: AbortSignal,
-) => submitJson(API_ENDPOINTS.mentorSubmit, payload, signal);
+) =>
+  submitJson(API_ENDPOINTS.mentorSubmit, payload, signal).then(async (result) => {
+    await clearMentorsCache();
+    return result;
+  });

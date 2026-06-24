@@ -3,6 +3,8 @@ import {
   readErrorMessage,
   type ApiRecord,
 } from "./apiClient";
+import { clearMentorsCache } from "./mentorApi";
+import { clearPublicationsCache } from "./publicationApi";
 
 export type PendingPublication = {
   _id: string;
@@ -92,12 +94,15 @@ export const fetchPendingMentors = async (signal?: AbortSignal) =>
     await adminRequest(API_ENDPOINTS.pendingMentors, {}, signal),
   );
 
-export const approvePendingPublication = (id: string, signal?: AbortSignal) =>
-  adminRequest(
+export const approvePendingPublication = async (id: string, signal?: AbortSignal) => {
+  const result = await adminRequest(
     `${API_ENDPOINTS.pendingPublications}/${id}/approve`,
     { method: "POST" },
     signal,
   );
+  await clearPublicationsCache();
+  return result;
+};
 
 export const declinePendingPublication = (id: string, signal?: AbortSignal) =>
   adminRequest(
@@ -106,12 +111,15 @@ export const declinePendingPublication = (id: string, signal?: AbortSignal) =>
     signal,
   );
 
-export const approvePendingMentor = (id: string, signal?: AbortSignal) =>
-  adminRequest(
+export const approvePendingMentor = async (id: string, signal?: AbortSignal) => {
+  const result = await adminRequest(
     `${API_ENDPOINTS.pendingMentors}/${id}/approve`,
     { method: "POST" },
     signal,
   );
+  await clearMentorsCache();
+  return result;
+};
 
 export const declinePendingMentor = (id: string, signal?: AbortSignal) =>
   adminRequest(

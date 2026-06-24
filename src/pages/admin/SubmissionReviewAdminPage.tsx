@@ -191,7 +191,7 @@ const SubmissionReviewAdminPage = () => {
             </span>
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-md border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
+              className="inline-flex items-center gap-2 rounded-md border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-900 cursor-pointer"
               onClick={() => void loadSubmissions()}
             >
               <FaRotateRight />

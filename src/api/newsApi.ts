@@ -5,6 +5,7 @@ import {
   readString,
   type ApiRecord,
 } from "./apiClient";
+import { createBrowserCache } from "./browserCache";
 
 export type NewsRecord = {
   _id: string;
@@ -30,6 +31,8 @@ export type NewsSubmissionPayload = {
   thumbNailImageFile?: File | null;
   imageFiles?: File[];
 };
+
+const NEWS_CACHE_TTL = 5 * 60 * 1000;
 
 const getNewsRecords = (payload: unknown): unknown[] => {
   if (Array.isArray(payload)) {
@@ -96,19 +99,47 @@ const normalizeNewsRecord = (payload: unknown): NewsRecord | null => {
   return null;
 };
 
-export const fetchNews = async (signal?: AbortSignal) => {
+const newsCache = createBrowserCache<NewsRecord[]>({
+  cacheName: "resfes-news-v1",
+  normalize: (data) => normalizeNewsRecords(data),
+  requestUrl: API_ENDPOINTS.news,
+  storageKey: "resfes-news",
+  ttlMs: NEWS_CACHE_TTL,
+});
+
+export const clearNewsCache = () => newsCache.clear();
+
+export const fetchNews = async (
+  signal?: AbortSignal,
+  options: { forceRefresh?: boolean } = {},
+) => {
+  if (!options.forceRefresh) {
+    const cachedNews = await newsCache.read();
+    if (cachedNews) {
+      return cachedNews;
+    }
+  }
+
   const response = await fetchWithRetry(API_ENDPOINTS.news, { signal });
 
   if (!response.ok) {
     throw new Error(`News request failed with ${response.status}`);
   }
 
-  return normalizeNewsRecords(await response.json());
+  const news = normalizeNewsRecords(await response.json());
+  await newsCache.write(news);
+  return news;
 };
 
 export const getNews = fetchNews;
 
 export const fetchNewsById = async (id: string, signal?: AbortSignal) => {
+  const cachedNews = await newsCache.read();
+  const cachedItem = cachedNews?.find((item) => item._id === decodeURIComponent(id));
+  if (cachedItem) {
+    return cachedItem;
+  }
+
   const response = await fetchWithRetry(`${API_ENDPOINTS.news}/${id}`, { signal });
 
   if (!response.ok) {
@@ -120,6 +151,14 @@ export const fetchNewsById = async (id: string, signal?: AbortSignal) => {
   if (!news) {
     throw new Error("News response did not contain a usable record");
   }
+
+  const nextNews = cachedNews
+    ? [
+        news,
+        ...cachedNews.filter((cachedItem) => cachedItem._id !== news._id),
+      ]
+    : [news];
+  await newsCache.write(nextNews);
 
   return news;
 };
@@ -163,7 +202,9 @@ export const submitNews = async (
     throw new Error(await readErrorMessage(response, `News submission failed with ${response.status}`));
   }
 
-  return response.json() as Promise<{ message: string; data: NewsRecord }>;
+  const result = (await response.json()) as { message: string; data: NewsRecord };
+  await clearNewsCache();
+  return result;
 };
 
 export const updateNews = async (
@@ -182,5 +223,7 @@ export const updateNews = async (
     throw new Error(await readErrorMessage(response, `News update failed with ${response.status}`));
   }
 
-  return response.json() as Promise<{ message: string; data: NewsRecord }>;
+  const result = (await response.json()) as { message: string; data: NewsRecord };
+  await clearNewsCache();
+  return result;
 };

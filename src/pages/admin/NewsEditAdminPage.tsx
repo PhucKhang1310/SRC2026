@@ -116,7 +116,7 @@ const NewsEditAdminPage = () => {
       <section className="mx-auto max-w-4xl">
         <button
           type="button"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-slate-300 transition hover:text-white"
+          className="mb-6 inline-flex items-center gap-2 text-sm cursor-pointer text-slate-300 transition hover:text-white"
           onClick={() => navigate("/admin/news")}
         >
           <FaArrowLeft />
@@ -248,7 +248,7 @@ const NewsEditAdminPage = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center cursor-pointer justify-center gap-2 rounded-md bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <FaFloppyDisk />
                 {isSubmitting ? "Saving..." : "Save changes"}

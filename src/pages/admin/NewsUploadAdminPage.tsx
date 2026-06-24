@@ -77,7 +77,7 @@ const NewsUploadAdminPage = () => {
       <section className="mx-auto max-w-4xl">
         <button
           type="button"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-slate-300 transition hover:text-white"
+          className="mb-6 inline-flex items-center gap-2 text-sm cursor-pointer text-slate-300 transition hover:text-white"
           onClick={() => navigate("/admin/news")}
         >
           <FaArrowLeft />

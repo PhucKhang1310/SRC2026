@@ -6,6 +6,7 @@ import {
   submitJson,
   type ApiRecord,
 } from "./apiClient";
+import { createBrowserCache } from "./browserCache";
 
 export type PublicationSubmissionPayload = {
   publishTitle: string;
@@ -21,6 +22,8 @@ export type PublicationSubmissionPayload = {
   }[];
   turnstileToken?: string;
 };
+
+const PUBLICATIONS_CACHE_TTL = 5 * 60 * 1000;
 
 const stripHtml = (value: string) =>
   value
@@ -48,6 +51,16 @@ const getPublicationRecords = (payload: unknown): unknown[] => {
 };
 
 const getPublicationImage = (record: ApiRecord, id: string) => {
+  const directImage = readString(record, [
+    "image",
+    "imageUrl",
+    "thumbNailImage",
+    "thumbnailImage",
+  ]);
+  if (directImage) {
+    return directImage;
+  }
+
   const images = record.images;
 
   if (Array.isArray(images)) {
@@ -106,14 +119,36 @@ const normalizePublications = (payload: unknown): PublicationItem[] =>
       Boolean(publication?.title),
     );
 
-export const fetchPublications = async (signal?: AbortSignal) => {
+const publicationsCache = createBrowserCache<PublicationItem[]>({
+  cacheName: "resfes-publications-v1",
+  normalize: (data) => normalizePublications(data),
+  requestUrl: API_ENDPOINTS.publications,
+  storageKey: "resfes-publications",
+  ttlMs: PUBLICATIONS_CACHE_TTL,
+});
+
+export const clearPublicationsCache = () => publicationsCache.clear();
+
+export const fetchPublications = async (
+  signal?: AbortSignal,
+  options: { forceRefresh?: boolean } = {},
+) => {
+  if (!options.forceRefresh) {
+    const cachedPublications = await publicationsCache.read();
+    if (cachedPublications) {
+      return cachedPublications;
+    }
+  }
+
   const response = await fetchWithRetry(API_ENDPOINTS.publications, { signal });
 
   if (!response.ok) {
     throw new Error(`Publications request failed with ${response.status}`);
   }
 
-  return normalizePublications(await response.json());
+  const publications = normalizePublications(await response.json());
+  await publicationsCache.write(publications);
+  return publications;
 };
 
 export const fetchPublicationById = async (
@@ -135,7 +170,11 @@ export const fetchPublicationById = async (
 export const submitPublication = (
   payload: PublicationSubmissionPayload,
   signal?: AbortSignal,
-) => submitJson(API_ENDPOINTS.publicationSubmit, payload, signal);
+) =>
+  submitJson(API_ENDPOINTS.publicationSubmit, payload, signal).then(async (result) => {
+    await clearPublicationsCache();
+    return result;
+  });
 
 export const parsePublicationDate = (date: string) => {
   const parsedDate = new Date(date);

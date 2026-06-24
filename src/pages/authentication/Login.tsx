@@ -79,12 +79,6 @@ const Login = () => {
                         />
                     </div>
 
-                    <div className="flex items-center justify-between -mt-2">
-                        <a href="#" className="text-sm text-[#ff6a1f] hover:text-[#e65c3b] transition-colors">
-                            Forgot password?
-                        </a>
-                    </div>
-
                     <button
                         type="submit"
                         className="btn mt-4 w-full border-0 bg-[#f27255] px-4 py-3 font-semibold text-white shadow-md transition-colors duration-300 hover:bg-[#e65c3b]"

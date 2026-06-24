@@ -12,11 +12,14 @@ const NewsAdminPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadNews = async (signal?: AbortSignal) => {
+  const loadNews = async (
+    signal?: AbortSignal,
+    options: { forceRefresh?: boolean } = {},
+  ) => {
     try {
       setIsLoading(true);
       setError("");
-      setNews(await fetchNews(signal));
+      setNews(await fetchNews(signal, options));
     } catch (loadError) {
       if (signal?.aborted) return;
       setError(loadError instanceof Error ? loadError.message : "Could not load news.");
@@ -74,19 +77,19 @@ const NewsAdminPage = () => {
           <div className="flex gap-3">
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-md border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
-              onClick={() => void loadNews()}
+              className="inline-flex items-center gap-2 rounded-md border cursor-pointer border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
+              onClick={() => void loadNews(undefined, { forceRefresh: true })}
             >
               <FaRotateRight />
               Refresh
             </button>
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-md bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-500"
+              className="inline-flex items-center gap-2 cursor-pointer rounded-md bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-500"
               onClick={() => navigate("/admin/news/upload")}
             >
               <FaPlus />
-              New news
+              Add news
             </button>
           </div>
         </div>
@@ -133,7 +136,7 @@ const NewsAdminPage = () => {
                 </span>
                 <button
                   type="button"
-                  className="inline-flex w-fit items-center gap-2 rounded-md border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-orange-500 hover:bg-slate-800"
+                  className="inline-flex w-fit items-center gap-2 rounded-md border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-orange-500 hover:bg-slate-800 cursor-pointer"
                   onClick={() => navigate(`/admin/news/${item._id}/edit`)}
                 >
                   <FaPen />

@@ -30,8 +30,7 @@ createRoot(document.getElementById("root")!).render(
       <UserProvider>
         <PageContentProvider>
           <Routes>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<App />} />
+            <Route path="/" element={<App />} />
             <Route path="/mentors" element={<Mentor />} />
             <Route path="/news-list" element={<NewsList />} />
             <Route path="/news-list/:id" element={<NewsDetail />} />
@@ -41,6 +40,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/submit" element={<SubmissionPage />} />
             <Route path="/submit/publication" element={<PublicationSubmission />} />
             <Route path="/submit/mentor" element={<MentorSubmission />} />
+
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/news" element={<NewsAdminPage />} />
             <Route path="/admin/news/upload" element={<NewsUploadAdminPage />} />

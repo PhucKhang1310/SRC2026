@@ -151,11 +151,14 @@ const AdminPage = () => {
     }
   };
 
-  const loadContent = async (signal?: AbortSignal) => {
+  const loadContent = async (
+    signal?: AbortSignal,
+    options: { forceRefresh?: boolean } = {},
+  ) => {
     try {
       setIsContentLoading(true);
       setContentError("");
-      setContent(await getPageContent(signal, { forceRefresh: true }));
+      setContent(await getPageContent(signal, options));
     } catch (loadError) {
       if (signal?.aborted) return;
       setContentError(
@@ -170,11 +173,14 @@ const AdminPage = () => {
     }
   };
 
-  const loadNews = async (signal?: AbortSignal) => {
+  const loadNews = async (
+    signal?: AbortSignal,
+    options: { forceRefresh?: boolean } = {},
+  ) => {
     try {
       setIsNewsLoading(true);
       setNewsError("");
-      setNews(await fetchNews(signal));
+      setNews(await fetchNews(signal, options));
     } catch (loadError) {
       if (signal?.aborted) return;
       setNewsError(
@@ -334,7 +340,7 @@ const AdminPage = () => {
               <button
                 type="button"
                 onClick={() => navigate("/admin/news")}
-                className="inline-flex items-center gap-2 rounded-lg border border-amber-50/25 px-3 py-2 text-sm font-semibold text-amber-50 transition hover:border-[#ff6a1f] hover:bg-amber-50/10"
+                className="inline-flex items-center gap-2 rounded-lg border border-amber-50/25 px-3 py-2 text-sm font-semibold cursor-pointer text-amber-50 transition hover:border-[#ff6a1f] hover:bg-amber-50/10"
               >
                 Manage news
                 <FaArrowRight />
@@ -401,8 +407,8 @@ const AdminPage = () => {
             <button
               type="button"
               onClick={() => {
-                void loadContent();
-                void loadNews();
+                void loadContent(undefined, { forceRefresh: true });
+                void loadNews(undefined, { forceRefresh: true });
                 setIsEditing(false);
                 setIsSaveBarVisible(false);
               }}
@@ -615,9 +621,8 @@ const HistorySection = ({
               <button
                 key={version.id}
                 type="button"
-                className={`btn justify-start border-amber-50/15 bg-zinc-950 text-left text-amber-50 hover:border-[#ff6a1f] ${
-                  selectedVersion?.id === version.id ? "border-[#ff6a1f]" : ""
-                }`}
+                className={`btn justify-start border-amber-50/15 bg-zinc-950 text-left text-amber-50 hover:border-[#ff6a1f] ${selectedVersion?.id === version.id ? "border-[#ff6a1f]" : ""
+                  }`}
                 onClick={() => onSelectVersion(version)}
               >
                 <FaEye className="size-4 shrink-0" />
