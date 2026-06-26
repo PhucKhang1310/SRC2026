@@ -3,7 +3,6 @@ import type { CSSProperties } from "react";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import HeroGlow from "../../assets/home-hero01.png";
 import logoFptu from '../../assets/logo-fptu.png'
-// import resfes2025 from '../../assets/2025-RES FES-VUÔNG-WHITE.png'
 import resfes2026 from '../../assets/logo_src_white_nobg.png'
 import fptLogoFixed from "../../assets/fpt_logo-removebg-preview_cropped.png";
 import { usePageContent } from "../../hook/usePageContent";

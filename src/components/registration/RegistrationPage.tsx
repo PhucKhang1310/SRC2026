@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { FaArrowLeft, FaCheck } from "react-icons/fa6";
-import { mentors } from "../../data/mentorData";
 import { useEditableContent } from "../../hook/useEditableContent";
 import Footer from "../footer/Footer";
 import NavBar from "../navbar/NavBar";
+import { fetchMentors } from "../../api/mentorApi"
 
 type RegistrationForm = {
   name: string;
@@ -29,15 +29,17 @@ const inputClass =
 const labelClass = "text-xs font-bold uppercase tracking-wide text-white/60";
 
 const RegistrationPage = () => {
+
   const { researchFields } = useEditableContent();
   const [form, setForm] = useState<RegistrationForm>(initialForm);
   const [status, setStatus] = useState("");
   const [errors, setErrors] = useState<Partial<RegistrationForm>>({});
 
-  const mentorOptions = useMemo(
-    () => mentors.map((mentor) => mentor.name).sort((a, b) => a.localeCompare(b)),
-    [],
-  );
+  const mentorOptions = useMemo(() => fetchMentors()
+    .then((data) => data.map((mentor) => mentor.name)
+      .sort((a, b) => a.localeCompare(b))),
+    []);
+
 
   const updateForm = (field: keyof RegistrationForm, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -170,10 +172,12 @@ const RegistrationPage = () => {
                 onChange={(event) => updateForm("mentor", event.target.value)}
               >
                 <option value="">Select a mentor</option>
-                {mentorOptions.map((mentor) => (
-                  <option key={mentor} value={mentor}>
-                    {mentor}
-                  </option>
+                {mentorOptions.then((mentors) => (
+                  mentors.map((mentor) => (
+                    <option key={mentor} value={mentor}>
+                      {mentor}
+                    </option>
+                  ))
                 ))}
               </select>
             </FormField>
