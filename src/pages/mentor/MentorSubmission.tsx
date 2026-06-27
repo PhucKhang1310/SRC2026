@@ -28,6 +28,14 @@ const initialForm: MentorSubmissionPayload = {
 };
 
 const MentorSubmission = () => {
+  const allowedHost = [
+    "orcid.org",
+    "www.orcid.org",
+    "researchgate.net",
+    "www.researchgate.net",
+    "scholar.google.com",
+  ];
+
   const navigate = useNavigate();
   const [form, setForm] = useState<MentorSubmissionPayload>(initialForm);
   const [status, setStatus] = useState("");
@@ -42,6 +50,24 @@ const MentorSubmission = () => {
   const updateField = (field: keyof MentorSubmissionPayload, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
     setStatus("");
+  };
+
+  const isSafeUrl = (url: string) => {
+    try {
+      const parsedUrl = new URL(url);
+      return ['http:', 'https:'].includes(parsedUrl.protocol);
+    } catch {
+      return false;
+    }
+  };
+
+  const isAllowedHost = (value: string) => {
+    try {
+      const parsedUrl = new URL(value);
+      return allowedHost.includes(parsedUrl.host);
+    } catch {
+      return false;
+    }
   };
 
   const handleSubmit = async () => {
@@ -131,7 +157,7 @@ const MentorSubmission = () => {
               label="Personal website"
               type="url"
               value={form.personalWebsite}
-              onChange={(value) => updateField("personalWebsite", value)}
+              onChange={(value) => isSafeUrl(value) && updateField("personalWebsite", value)}
             />
             <TextInput
               label="ORCID"
@@ -142,19 +168,19 @@ const MentorSubmission = () => {
               label="ResearchGate"
               type="url"
               value={form.researchGate}
-              onChange={(value) => updateField("researchGate", value)}
+              onChange={(value) => isSafeUrl(value) && isAllowedHost(value) && updateField("researchGate", value)}
             />
             <TextInput
               label="Google Scholar"
               type="url"
               value={form.googleScholar}
-              onChange={(value) => updateField("googleScholar", value)}
+              onChange={(value) => isSafeUrl(value) && isAllowedHost(value) && updateField("googleScholar", value)}
             />
             <TextInput
               label="Avatar image"
               type="url"
               value={form.avatarImage}
-              onChange={(value) => updateField("avatarImage", value)}
+              onChange={(value) => isSafeUrl(value) && updateField("avatarImage", value)}
             />
             <div className="md:col-span-2">
               <TextArea

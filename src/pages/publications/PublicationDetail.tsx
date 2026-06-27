@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import DOMPurify from "dompurify";
 import { FaArrowLeft } from "react-icons/fa6";
 import { fetchPublicationById, parsePublicationDate } from "../../api/publicationApi";
 import type { PublicationItem } from "../../data/publicationsData";
@@ -7,11 +8,8 @@ import NavBar from "../../components/navbar/NavBar";
 import Footer from "../../components/navbar/NavBar";
 import LoadingPage from "../../components/loading/LoadingPage";
 
-const sanitizePublicationHtml = (html: string) =>
-  html
-    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
-    .replace(/\son\w+=["'][^"']*["']/gi, "")
-    .replace(/\sjavascript:/gi, "");
+
+
 
 const PublicationDetail = () => {
   const { id } = useParams();
@@ -52,7 +50,7 @@ const PublicationDetail = () => {
   }, [id]);
 
   const contentHtml = useMemo(
-    () => sanitizePublicationHtml(publication?.content || publication?.description || ""),
+    () => DOMPurify.sanitize(publication?.content || "", { USE_PROFILES: { html: true } }),
     [publication]
   );
 

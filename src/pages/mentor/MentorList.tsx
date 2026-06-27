@@ -76,121 +76,118 @@ const MentorList = ({
           return (
             <div
               key={cardId}
-              className={`group flex flex-col rounded-xl border border-amber-50/10 bg-zinc-900 p-5 transition-all duration-300 hover:border-amber-400/30 hover:shadow-lg hover:shadow-amber-400/5 ${
-                isExpanded ? "min-h-60" : "h-60"
-              }`}
+              className={`group flex flex-col rounded-xl border border-amber-50/10 bg-zinc-900 p-5 transition-all duration-300 hover:border-amber-400/30 hover:shadow-lg hover:shadow-amber-400/5 ${isExpanded ? "min-h-60" : "h-60"
+                }`}
             >
-            {/* Top section: photo + name + role */}
-            <div className="flex h-16 shrink-0 items-start gap-4 overflow-hidden">
-              {mentor.image ? (
-                <img
-                  className="size-14 rounded-lg object-cover ring-2 ring-amber-400/20"
-                  src={mentor.image}
-                  alt={mentor.name}
-                  loading="lazy"
-                />
-              ) : (
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-amber-400/15 text-sm font-bold text-amber-200 ring-2 ring-amber-400/20">
-                  {getInitials(mentor.name)}
+              {/* Top section: photo + name + role */}
+              <div className="flex h-16 shrink-0 items-start gap-4 overflow-hidden">
+                {mentor.image ? (
+                  <img
+                    className="size-14 rounded-lg object-cover ring-2 ring-amber-400/20"
+                    src={mentor.image}
+                    alt={mentor.name}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-amber-400/15 text-sm font-bold text-amber-200 ring-2 ring-amber-400/20">
+                    {getInitials(mentor.name)}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1 overflow-hidden">
+                  <h3 className="line-clamp-1 text-base font-bold uppercase tracking-wide text-amber-50 wrap-anywhere">
+                    {mentor.name}
+                  </h3>
+                  <div className="mt-1 flex items-start gap-1.5 overflow-hidden text-sm text-amber-400/80">
+                    {(() => {
+                      const dept = mentor.role.split("|")[1]?.trim() ?? "";
+                      const DeptIcon = departmentIcons?.[dept] ?? FaGraduationCap;
+                      return <DeptIcon className="mt-0.5 size-3.5 shrink-0" />;
+                    })()}
+                    <span className="line-clamp-2 wrap-anywhere">
+                      {mentor.role}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description with research icon */}
+              <div
+                className={`mt-4 mb-4 flex min-h-0 border-l-2 border-amber-400/30 pl-3 ${isExpanded
+                    ? "flex-none overflow-visible"
+                    : "flex-1 overflow-hidden"
+                  }`}
+              >
+                <FaFlask className="mt-0.5 size-3.5 shrink-0 text-amber-400/60" />
+                <p
+                  className={`ml-2.5 text-sm leading-relaxed text-amber-50/70 wrap-anywhere ${isExpanded
+                      ? "overflow-visible"
+                      : "overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:4]"
+                    }`}
+                >
+                  {mentor.description}
+                </p>
+              </div>
+
+              {/* Links row */}
+              {(canExpand || links) && (
+                <div className="mt-auto flex shrink-0 items-center gap-1 border-t border-amber-50/5 pt-3">
+                  {links?.website && (
+                    <a
+                      href={links.website}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
+                      aria-label={`${mentor.name} website`}
+                    >
+                      <FaGlobe className="size-3.5" />
+                    </a>
+                  )}
+                  {links?.orcid && (
+                    <a
+                      href={links.orcid}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
+                      aria-label={`${mentor.name} ORCID`}
+                    >
+                      <SiOrcid className="size-3.5" />
+                    </a>
+                  )}
+                  {links?.researchgate && (
+                    <a
+                      href={links.researchgate}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
+                      aria-label={`${mentor.name} ResearchGate`}
+                    >
+                      <SiResearchgate className="size-3.5" />
+                    </a>
+                  )}
+                  {links?.googleScholar && (
+                    <a
+                      href={links.googleScholar}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
+                      aria-label={`${mentor.name} Google Scholar`}
+                    >
+                      <SiGooglescholar className="size-3.5" />
+                    </a>
+                  )}
+                  {canExpand && (
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-xs ml-auto rounded-lg px-0 text-amber-400/80 hover:text-amber-200"
+                      aria-expanded={isExpanded}
+                      onClick={() => toggleExpanded(cardId)}
+                    >
+                      {isExpanded ? "Read less" : "Read more"}
+                    </button>
+                  )}
                 </div>
               )}
-              <div className="min-w-0 flex-1 overflow-hidden">
-                <h3 className="line-clamp-1 text-base font-bold uppercase tracking-wide text-amber-50 wrap-anywhere">
-                  {mentor.name}
-                </h3>
-                <div className="mt-1 flex items-start gap-1.5 overflow-hidden text-sm text-amber-400/80">
-                  {(() => {
-                    const dept = mentor.role.split("|")[1]?.trim() ?? "";
-                    const DeptIcon = departmentIcons?.[dept] ?? FaGraduationCap;
-                    return <DeptIcon className="mt-0.5 size-3.5 shrink-0" />;
-                  })()}
-                  <span className="line-clamp-2 wrap-anywhere">
-                    {mentor.role}
-                  </span>
-                </div>
-              </div>
             </div>
-
-            {/* Description with research icon */}
-            <div
-              className={`mt-4 mb-4 flex min-h-0 border-l-2 border-amber-400/30 pl-3 ${
-                isExpanded
-                  ? "flex-none overflow-visible"
-                  : "flex-1 overflow-hidden"
-              }`}
-            >
-              <FaFlask className="mt-0.5 size-3.5 shrink-0 text-amber-400/60" />
-              <p
-                className={`ml-2.5 text-sm leading-relaxed text-amber-50/70 wrap-anywhere ${
-                  isExpanded
-                    ? "overflow-visible"
-                    : "overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:4]"
-                }`}
-              >
-                {mentor.description}
-              </p>
-            </div>
-
-            {/* Links row */}
-            {(canExpand || links) && (
-              <div className="mt-auto flex shrink-0 items-center gap-1 border-t border-amber-50/5 pt-3">
-                {links?.website && (
-                  <a
-                    href={links.website}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
-                    aria-label={`${mentor.name} website`}
-                  >
-                    <FaGlobe className="size-3.5" />
-                  </a>
-                )}
-                {links?.orcid && (
-                  <a
-                    href={links.orcid}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
-                    aria-label={`${mentor.name} ORCID`}
-                  >
-                    <SiOrcid className="size-3.5" />
-                  </a>
-                )}
-                {links?.researchgate && (
-                  <a
-                    href={links.researchgate}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
-                    aria-label={`${mentor.name} ResearchGate`}
-                  >
-                    <SiResearchgate className="size-3.5" />
-                  </a>
-                )}
-                {links?.googleScholar && (
-                  <a
-                    href={links.googleScholar}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-ghost btn-xs rounded-lg opacity-60 hover:opacity-100"
-                    aria-label={`${mentor.name} Google Scholar`}
-                  >
-                    <SiGooglescholar className="size-3.5" />
-                  </a>
-                )}
-                {canExpand && (
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-xs ml-auto rounded-lg px-0 text-amber-400/80 hover:text-amber-200"
-                    aria-expanded={isExpanded}
-                    onClick={() => toggleExpanded(cardId)}
-                  >
-                    {isExpanded ? "Read less" : "Read more"}
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
           );
         })}
       </div>
