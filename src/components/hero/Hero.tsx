@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import HeroGlow from "../../assets/home-hero01.png";
-import logoFptu from '../../assets/logo-fptu.png'
 import resfes2026 from '../../assets/logo_src_white_nobg.png'
-import fptLogoFixed from "../../assets/fpt_logo-removebg-preview_cropped.png";
 import { usePageContent } from "../../hook/usePageContent";
 
 
@@ -196,15 +194,15 @@ const Hero = () => {
             {isMobile ? (
               <>
                 <div className="flex flex-col justify-center col-span-6">
-                  <img src={logoFptu} alt="Fpt University Logo" className="w-100 h-28 object-contain" />
-                  <img src={fptLogoFixed} alt="Fpt logo 20 năm" className="w-100 h-36 object-contain" />
+                  <img src={resfes2026} alt="SRC 2026 logo" className="w-100 h-28 object-contain" />
+                  <img src={resfes2026} alt="SRC 2026 logo" className="w-100 h-36 object-contain" />
                   <img src={resfes2026} alt="2026 Resfes Logo" className="w-100 h-28 object-contain" />
                 </div>
               </>
             ) : (
               <div className="flex justify-center col-span-6">
-                <img src={logoFptu} alt="Fpt University Logo" className="w-100 h-28 object-contain" />
-                <img src={fptLogoFixed} alt="Fpt logo 20 năm" className="w-100 h-36 object-contain" />
+                <img src={resfes2026} alt="SRC 2026 logo" className="w-100 h-28 object-contain" />
+                <img src={resfes2026} alt="SRC 2026 logo" className="w-100 h-36 object-contain" />
                 <img src={resfes2026} alt="2026 Resfes Logo" className="w-100 h-28 object-contain" />
               </div>
             )}

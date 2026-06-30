@@ -2,12 +2,40 @@ import { useEffect, useState } from "react";
 import { fetchPublications, parsePublicationDate } from "../../api/publicationApi";
 import type { PublicationItem } from "../../data/publicationsData";
 import NavBar from "../../components/navbar/NavBar";
-import Footer from "../../components/navbar/NavBar";
+import Footer from "../../components/footer/Footer";
 import Pagination from "../../components/pagination/Pagination";
-import { FaArrowLeft } from "react-icons/fa6";
+import { FaArrowLeft, FaMoon, FaSun } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import LoadingPage from "../../components/loading/LoadingPage";
+
+const darkTheme = {
+  page: "bg-black text-amber-50",
+  backButton: "text-amber-50/70 hover:text-amber-50",
+  toggleButton:
+    "border-amber-50/15 text-amber-50/75 hover:border-[#ff6a1f] hover:bg-[#ff6a1f]/10 hover:text-amber-50",
+  subtitle: "text-amber-50/50",
+  divider: "divide-amber-50/10",
+  emptyText: "text-amber-50/50",
+  row: "hover:bg-amber-50/5",
+  title: "text-amber-50 group-hover:text-[#ff6a1f]",
+  separator: "text-amber-50/30",
+  date: "text-amber-50/50",
+};
+
+const lightTheme = {
+  page: "bg-slate-50 text-slate-950",
+  backButton: "text-slate-600 hover:text-slate-950",
+  toggleButton:
+    "border-slate-300 text-slate-700 hover:border-[#ff6a1f] hover:bg-orange-50 hover:text-slate-950",
+  subtitle: "text-slate-500",
+  divider: "divide-slate-200",
+  emptyText: "text-slate-500",
+  row: "hover:bg-orange-50/70",
+  title: "text-slate-950 group-hover:text-[#ff6a1f]",
+  separator: "text-slate-300",
+  date: "text-slate-500",
+};
 
 const PublicationsList = () => {
   const pageSize = 8;
@@ -16,9 +44,11 @@ const PublicationsList = () => {
   const [items, setItems] = useState<PublicationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
+  const [themeMode, setThemeMode] = useState<"dark" | "light">("dark");
   const navigate = useNavigate();
   const location = useLocation();
   const { isMobile } = useCheckMobile();
+  const theme = themeMode === "light" ? lightTheme : darkTheme;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -79,17 +109,26 @@ const PublicationsList = () => {
   }
 
   return (
-    <main className="min-h-screen bg-black text-amber-50">
-      <NavBar />
+    <main className={`min-h-screen ${theme.page}`} data-theme={themeMode}>
+      <NavBar themeMode={themeMode} />
       <section className="mx-auto w-4/5 max-w-5xl pt-36 pb-16">
         {/* Back button */}
-        <div>
+        <div className="flex items-center justify-between gap-4">
           <button
             onClick={() => navigate("/home#publications")}
-            className="text-md flex items-center gap-2 cursor-pointer text-amber-50/70 hover:text-amber-50 transition-colors"
+            className={`text-md flex cursor-pointer items-center gap-2 transition-colors ${theme.backButton}`}
           >
             <FaArrowLeft size={16} />
             Back
+          </button>
+          <button
+            type="button"
+            onClick={() => setThemeMode((mode) => (mode === "dark" ? "light" : "dark"))}
+            className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-wider transition ${theme.toggleButton}`}
+            aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} theme`}
+          >
+            {themeMode === "dark" ? <FaSun /> : <FaMoon />}
+            {themeMode === "dark" ? "Light" : "Dark"}
           </button>
         </div>
 
@@ -98,34 +137,34 @@ const PublicationsList = () => {
           <h1 className="text-3xl font-black uppercase tracking-wider text-[#ff6a1f] md:text-4xl">
             Publications
           </h1>
-          <p className="mt-3 text-sm text-amber-50/50">
+          <p className={`mt-3 text-sm ${theme.subtitle}`}>
             Published research papers from SRC competitions
           </p>
         </div>
 
         {/* Publication list */}
-        <div className="divide-y divide-amber-50/10">
+        <div className={`divide-y ${theme.divider}`}>
           {fetchError && (
-            <div className="py-10 text-center text-sm text-amber-50/50">
+            <div className={`py-10 text-center text-sm ${theme.emptyText}`}>
               {fetchError}
             </div>
           )}
           {!fetchError && items.length === 0 && (
-            <div className="py-10 text-center text-sm text-amber-50/50">
+            <div className={`py-10 text-center text-sm ${theme.emptyText}`}>
               No publications are available.
             </div>
           )}
           {items.map((pub) => (
             <article
               key={pub.id}
-              className="group py-5 transition-colors hover:bg-amber-50/2 px-4 -mx-4 rounded"
+              className={`group -mx-4 rounded px-4 py-5 transition-colors ${theme.row}`}
             >
               <a
                 href={`/publications/${encodeURIComponent(pub.id)}`}
                 className="block"
               >
                 <h2
-                  className={`font-bold leading-snug text-amber-50 group-hover:text-[#ff6a1f] transition-colors ${isMobile ? "text-sm" : "text-base"
+                  className={`font-bold leading-snug transition-colors ${theme.title} ${isMobile ? "text-sm" : "text-base"
                     }`}
                 >
                   {pub.title}
@@ -134,8 +173,8 @@ const PublicationsList = () => {
                   <span className="font-bold text-[#ff6a1f]">
                     {pub.source}
                   </span>
-                  <span className="text-amber-50/30">|</span>
-                  <span className="text-amber-50/50">
+                  <span className={theme.separator}>|</span>
+                  <span className={theme.date}>
                     {parsePublicationDate(pub.date).toLocaleDateString("vi-VN", {
                       day: "2-digit",
                       month: "short",

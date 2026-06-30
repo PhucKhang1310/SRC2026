@@ -3,10 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
 import MobileMenu from "./MobileMenu";
 import { useCheckMobile } from "../../hook/useCheckMobile";
-import fptLogoFixed from "../../assets/fpt_logo-removebg-preview_cropped.png";
+import srcLogo from "../../assets/logo_src_white_nobg.png";
 import { useUser } from "../../hook/useUser";
 
-const NavBar = () => {
+type NavBarProps = {
+  themeMode?: "dark" | "light";
+};
+
+const NavBar = ({ themeMode = "dark" }: NavBarProps) => {
   const { user } = useUser();
   const { isMobile } = useCheckMobile();
   const navigate = useNavigate();
@@ -29,6 +33,13 @@ const NavBar = () => {
   const [isAtTop, setIsAtTop] = useState(true);
   const previousScrollY = useRef(0);
   const dropdownRef = useRef<HTMLDetailsElement>(null);
+  const isLight = themeMode === "light";
+  const desktopTextClass =
+    isLight && isAtTop
+      ? "text-slate-900 [&>li>button]:hover:text-[#ff6a1f]"
+      : "text-white [&>li>button]:hover:text-amber-200";
+  const menuIconColor = isLight && isAtTop ? "#0f172a" : "white";
+  const logoFilterClass = isLight ? "invert" : "";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -81,17 +92,18 @@ const NavBar = () => {
         >
           <div className="mx-auto w-full max-w-7xl px-6 py-4 lg:px-8">
             <div className="navbar text-black!">
-              <div className="navbar-start flex items-center gap-6">
+              <div className="navbar-start flex w-auto flex-1 items-center gap-6">
                 <a
                   href="/"
-                  className="inline-flex items-center justify-center leading-none"
+                  className="inline-flex shrink-0 items-center justify-center leading-none"
                 >
                   <img
-                    src={fptLogoFixed}
-                    className="block h-15 w-auto object-contain scale-180"
+                    src={srcLogo}
+                    className={`block h-16 w-auto scale-125 object-contain transition-[filter] duration-300 ${logoFilterClass}`}
+                    alt="SRC 2026 logo"
                   />
                 </a>
-                <ul className="menu menu-horizontal text-white px-1 [&>li>button]:text-lg [&>li>button]:font-thin [&>li>button]:hover:bg-transparent [&>li>button]:hover:text-amber-200 [&>li>button]:transition-all [&>li>button]:cursor-pointer">
+                <ul className={`menu menu-horizontal flex-nowrap px-1 [&>li>button]:text-lg [&>li>button]:font-thin [&>li>button]:hover:bg-transparent [&>li>button]:transition-all [&>li>button]:cursor-pointer ${desktopTextClass}`}>
                   <li><button onClick={() => scrollToSection("about")}>About</button></li>
                   <li><button onClick={() => scrollToSection("research-fields")}>Research Fields</button></li>
                   <li><button onClick={() => scrollToSection("regulations")}>Regulations</button></li>
@@ -102,7 +114,7 @@ const NavBar = () => {
               <div className="navbar-end">
                 <details ref={dropdownRef} className="dropdown dropdown-end" onToggle={(e) => setIsDropdownOpen((e.currentTarget as HTMLDetailsElement).open)}>
                   <summary className="btn btn-ghost btn-circle">
-                    <RxHamburgerMenu size={24} color="white" />
+                    <RxHamburgerMenu size={24} color={menuIconColor} />
                   </summary>
                   <ul className="dropdown-content menu bg-base-100 text-base-content rounded-box z-50 mt-3 w-52 p-2 shadow-lg border border-base-300" onClick={() => dropdownRef.current?.removeAttribute("open")}>
                     <li><a href="/publications">Publications</a></li>
@@ -131,7 +143,7 @@ const NavBar = () => {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-30 flex items-center gap-4 px-6 py-4 lg:px-10 transition-all duration-200 ${isHidden ? "-translate-y-full" : "translate-y-0"
-          } ${isAtTop ? "bg-black" : "bg-[#ff6a1f]"} `}
+          } ${isAtTop ? (isLight ? "bg-white" : "bg-black") : "bg-[#ff6a1f]"} `}
       >
         <button
           type="button"
@@ -140,13 +152,14 @@ const NavBar = () => {
           aria-label="Open menu"
           aria-expanded={isMenuOpen}
         >
-          <RxHamburgerMenu size={25} color="white" />
+          <RxHamburgerMenu size={25} color={menuIconColor} />
         </button>
 
         <a href="/" className="inline-flex items-center leading-none">
           <img
-            src={fptLogoFixed}
-            className="block h-15 w-auto object-contain"
+            src={srcLogo}
+            className={`block h-15 w-auto scale-125 object-contain transition-[filter] duration-300 ${logoFilterClass}`}
+            alt="SRC 2026 logo"
           />
         </a>
       </header>

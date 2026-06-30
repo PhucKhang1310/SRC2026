@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaGlobe, FaGraduationCap, FaFlask } from "react-icons/fa6";
+import { FaBullseye, FaGlobe, FaGraduationCap, FaLayerGroup } from "react-icons/fa6";
 import { SiGooglescholar, SiOrcid, SiResearchgate } from "react-icons/si";
 import type { MentorItem } from "../../data/mentorData";
 import type { IconType } from "react-icons";
@@ -9,17 +9,50 @@ interface MentorListProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   departmentIcons?: Record<string, IconType>;
+  themeMode?: "dark" | "light";
 }
+
+const darkTheme = {
+  searchShell: "border-amber-50/20 bg-zinc-900",
+  searchInput: "border-amber-50/20 bg-zinc-800 text-amber-50 placeholder:text-amber-50/35",
+  card: "border-amber-50/10 bg-zinc-900 hover:border-amber-400/30 hover:shadow-amber-400/5",
+  avatarFallback: "bg-amber-400/15 text-amber-200 ring-amber-400/20",
+  imageRing: "ring-amber-400/20",
+  title: "text-amber-50",
+  role: "text-amber-400/80",
+  detailBorder: "border-amber-400/30",
+  detailText: "text-amber-50/70",
+  icon: "text-amber-400/70",
+  linkBorder: "border-amber-50/5",
+  readMore: "text-amber-400/80 hover:text-amber-200",
+};
+
+const lightTheme = {
+  searchShell: "border-slate-200 bg-white",
+  searchInput: "border-slate-300 bg-slate-50 text-slate-950 placeholder:text-slate-400",
+  card: "border-slate-200 bg-white hover:border-orange-300 hover:shadow-orange-100",
+  avatarFallback: "bg-orange-100 text-orange-700 ring-orange-200",
+  imageRing: "ring-orange-200",
+  title: "text-slate-950",
+  role: "text-orange-700",
+  detailBorder: "border-orange-300",
+  detailText: "text-slate-700",
+  icon: "text-orange-600",
+  linkBorder: "border-slate-200",
+  readMore: "text-orange-700 hover:text-orange-900",
+};
 
 const MentorList = ({
   mentors,
   searchTerm,
   onSearchChange,
   departmentIcons,
+  themeMode = "dark",
 }: MentorListProps) => {
   const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>(
     {}
   );
+  const theme = themeMode === "light" ? lightTheme : darkTheme;
 
   const getInitials = (name: string) =>
     name
@@ -40,8 +73,8 @@ const MentorList = ({
   return (
     <div className="space-y-6">
       {/* Search bar */}
-      <div className="sticky top-0 z-20 rounded-xl border border-amber-50/20 bg-zinc-900 px-4 py-3">
-        <label className="input input-bordered flex w-full items-center gap-2 border-amber-50/20 bg-zinc-800 text-amber-50">
+      <div className={`sticky top-0 z-20 rounded-xl border px-4 py-3 ${theme.searchShell}`}>
+        <label className={`input input-bordered flex w-full items-center gap-2 ${theme.searchInput}`}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
@@ -72,32 +105,38 @@ const MentorList = ({
           const isExpanded = expandedCards[cardId] ?? false;
           const canExpand = mentor.description.length > 180;
           const links = mentor.links;
+          const detailRows = [
+            { icon: FaLayerGroup, title: "Research areas", value: mentor.researchAreas },
+            { icon: FaBullseye, title: "Research topics", value: mentor.researchTopics },
+          ].filter((row): row is { icon: typeof FaLayerGroup; title: string; value: string } =>
+            Boolean(row.value),
+          );
 
           return (
             <div
               key={cardId}
-              className={`group flex flex-col rounded-xl border border-amber-50/10 bg-zinc-900 p-5 transition-all duration-300 hover:border-amber-400/30 hover:shadow-lg hover:shadow-amber-400/5 ${isExpanded ? "min-h-60" : "h-60"
+              className={`group flex flex-col rounded-xl border p-5 transition-all duration-300 hover:shadow-lg ${theme.card} ${isExpanded ? "min-h-60" : "min-h-[15.5rem]"
                 }`}
             >
               {/* Top section: photo + name + role */}
               <div className="flex h-16 shrink-0 items-start gap-4 overflow-hidden">
                 {mentor.image ? (
                   <img
-                    className="size-14 rounded-lg object-cover ring-2 ring-amber-400/20"
+                    className={`size-14 rounded-lg object-cover ring-2 ${theme.imageRing}`}
                     src={mentor.image}
                     alt={mentor.name}
                     loading="lazy"
                   />
                 ) : (
-                  <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-amber-400/15 text-sm font-bold text-amber-200 ring-2 ring-amber-400/20">
+                  <div className={`flex size-14 shrink-0 items-center justify-center rounded-lg text-sm font-bold ring-2 ${theme.avatarFallback}`}>
                     {getInitials(mentor.name)}
                   </div>
                 )}
                 <div className="min-w-0 flex-1 overflow-hidden">
-                  <h3 className="line-clamp-1 text-base font-bold uppercase tracking-wide text-amber-50 wrap-anywhere">
+                  <h3 className={`line-clamp-1 text-base font-bold uppercase tracking-wide wrap-anywhere ${theme.title}`}>
                     {mentor.name}
                   </h3>
-                  <div className="mt-1 flex items-start gap-1.5 overflow-hidden text-sm text-amber-400/80">
+                  <div className={`mt-1 flex items-start gap-1.5 overflow-hidden text-sm ${theme.role}`}>
                     {(() => {
                       const dept = mentor.role.split("|")[1]?.trim() ?? "";
                       const DeptIcon = departmentIcons?.[dept] ?? FaGraduationCap;
@@ -112,25 +151,52 @@ const MentorList = ({
 
               {/* Description with research icon */}
               <div
-                className={`mt-4 mb-4 flex min-h-0 border-l-2 border-amber-400/30 pl-3 ${isExpanded
+                className={`mt-4 mb-4 flex border-l-2 pl-3 ${theme.detailBorder} ${isExpanded
                     ? "flex-none overflow-visible"
-                    : "flex-1 overflow-hidden"
+                    : "flex-1"
                   }`}
               >
-                <FaFlask className="mt-0.5 size-3.5 shrink-0 text-amber-400/60" />
-                <p
-                  className={`ml-2.5 text-sm leading-relaxed text-amber-50/70 wrap-anywhere ${isExpanded
+                <div
+                  className={`space-y-2 text-sm leading-relaxed wrap-anywhere ${theme.detailText} ${isExpanded
                       ? "overflow-visible"
-                      : "overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:4]"
+                      : ""
                     }`}
                 >
-                  {mentor.description}
-                </p>
+                  {detailRows.length ? (
+                    detailRows.map((row) => (
+                      <p key={row.title} className="flex gap-2">
+                        <row.icon
+                          className={`mt-1 size-3.5 shrink-0 ${theme.icon}`}
+                          aria-label={row.title}
+                        />
+                        <span
+                          className={
+                            isExpanded
+                              ? ""
+                              : "overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
+                          }
+                        >
+                          {row.value}
+                        </span>
+                      </p>
+                    ))
+                  ) : (
+                    <p
+                      className={
+                        isExpanded
+                          ? ""
+                          : "overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:4]"
+                      }
+                    >
+                      {mentor.description}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Links row */}
               {(canExpand || links) && (
-                <div className="mt-auto flex shrink-0 items-center gap-1 border-t border-amber-50/5 pt-3">
+                <div className={`mt-auto flex shrink-0 items-center gap-1 border-t pt-3 ${theme.linkBorder}`}>
                   {links?.website && (
                     <a
                       href={links.website}
@@ -178,7 +244,7 @@ const MentorList = ({
                   {canExpand && (
                     <button
                       type="button"
-                      className="btn btn-ghost btn-xs ml-auto rounded-lg px-0 text-amber-400/80 hover:text-amber-200"
+                      className={`btn btn-ghost btn-xs ml-auto rounded-lg px-0 ${theme.readMore}`}
                       aria-expanded={isExpanded}
                       onClick={() => toggleExpanded(cardId)}
                     >

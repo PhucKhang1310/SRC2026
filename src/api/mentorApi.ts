@@ -38,6 +38,7 @@ const readMentorLinks = (
   return {
     website:
       readString(record, ["website", "websiteUrl", "profileUrl"]) ||
+      readString(record, ["personalWebsite"]) ||
       readString(record, ["Personal Website"]) ||
       readString(links, ["website", "websiteUrl", "profileUrl"]),
     orcid:
@@ -120,6 +121,7 @@ const normalizeMentors = (payload: unknown): MentorItem[] =>
         "Research Topics (Hướng nghiên cứu cụ thể)",
       ]);
       const image = readString(record, [
+        "avatarImage",
         "image",
         "imageUrl",
         "photo",
@@ -137,8 +139,10 @@ const normalizeMentors = (payload: unknown): MentorItem[] =>
         ]),
         role,
         description:
-          readString(record, ["description", "bio"]) ||
+          readString(record, ["description", "bio", "note", "feedback"]) ||
           [researchAreas, researchTopics].filter(Boolean).join(". "),
+        ...(researchAreas ? { researchAreas } : {}),
+        ...(researchTopics ? { researchTopics } : {}),
         ...(image ? { image } : {}),
         ...(hasLinks ? { links } : {}),
       };

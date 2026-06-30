@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { fetchNews, type NewsRecord } from "../../api/newsApi";
-import fptLogo from "../../assets/fpt_logo.jpg";
+import srcLogo from "../../assets/logo_src_white_nobg.png";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import { usePageContent } from "../../hook/usePageContent";
 import LoadingPage from "../../components/loading/LoadingPage";
 
 const getNewsImage = (newsItem: NewsRecord) =>
-  newsItem.thumbNailImage || newsItem.images[0] || fptLogo;
+  newsItem.thumbNailImage || newsItem.images[0] || srcLogo;
 
 const News = () => {
   const { isMobile } = useCheckMobile();

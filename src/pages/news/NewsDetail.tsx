@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
 import { fetchNews, type NewsRecord } from "../../api/newsApi";
-import fptLogo from "../../assets/fpt_logo.jpg";
+import srcLogo from "../../assets/logo_src_white_nobg.png";
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import Footer from "../../components/footer/Footer";
 import Navbar from "../../components/navbar/NavBar";
 import LoadingPage from "../../components/loading/LoadingPage";
 
 const getNewsImage = (item: NewsRecord) =>
-  item.thumbNailImage || item.images[0] || fptLogo;
+  item.thumbNailImage || item.images[0] || srcLogo;
 
 const NewsDetail = () => {
   const { isMobile } = useCheckMobile();

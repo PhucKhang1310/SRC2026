@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  FaArrowLeft,
   FaCheck,
   FaEnvelope,
   FaLink,
@@ -8,7 +7,7 @@ import {
   FaUserTie,
   FaXmark,
 } from "react-icons/fa6";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   approvePendingMentor,
   approvePendingPublication,
@@ -21,6 +20,7 @@ import {
 } from "../../api/adminSubmissionsApi";
 import LoadingPage from "../../components/loading/LoadingPage";
 import { useUser } from "../../hook/useUser";
+import AdminSidebar from "./AdminSidebar";
 
 type QueueType = "publications" | "mentors";
 
@@ -41,6 +41,7 @@ const stripHtml = (value: string) =>
 
 const SubmissionReviewAdminPage = () => {
   const { user, isLoading: isUserLoading } = useUser();
+  const location = useLocation();
   const navigate = useNavigate();
   const [activeQueue, setActiveQueue] = useState<QueueType>("publications");
   const [publications, setPublications] = useState<PendingPublication[]>([]);
@@ -86,12 +87,24 @@ const SubmissionReviewAdminPage = () => {
     }
   };
 
+  const setQueue = (queue: QueueType) => {
+    setActiveQueue(queue);
+    navigate(`/admin/submissions?queue=${queue}`, { replace: true });
+  };
+
   useEffect(() => {
     const controller = new AbortController();
     void loadSubmissions(controller.signal);
 
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    const queue = new URLSearchParams(location.search).get("queue");
+    if (queue === "mentors" || queue === "publications") {
+      setActiveQueue(queue);
+    }
+  }, [location.search]);
 
   if (isUserLoading) {
     return <LoadingPage label="Checking login status" />;
@@ -161,94 +174,97 @@ const SubmissionReviewAdminPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
-      <section className="mx-auto max-w-6xl">
-        <div className="mb-8 flex flex-col gap-4 border-b border-slate-800 pb-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <button
-              type="button"
-              className="mb-4 inline-flex items-center gap-2 text-sm text-slate-300 transition hover:text-white"
-              onClick={() => navigate("/admin")}
-            >
-              <FaArrowLeft />
-              Back to admin
-            </button>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-400">
-              Admin review
-            </p>
-            <h1 className="mt-1 text-3xl font-bold text-white">
-              Pending submissions
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-400">
-              Approve mentor profiles and publication records before they appear
-              on the public site.
-            </p>
-          </div>
+    <main className="flex h-screen w-full overflow-hidden bg-[#050505] font-sans text-amber-50">
+      <AdminSidebar description="Review and approve submitted site content." />
 
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-md border border-slate-700 px-3 py-2 text-sm text-slate-300">
+      <section className="relative flex-1 overflow-y-auto bg-[#0a0a0a]">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-amber-50/5 bg-[#0a0a0a]/80 px-6 py-4 shadow-sm backdrop-blur-md md:px-10">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-[#ff6a1f]" />
+            <h2 className="text-lg font-medium tracking-wide text-amber-50/90">
+              Pending submissions
+            </h2>
+          </div>
+          <button
+            type="button"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-amber-50/15 px-4 py-2 text-sm font-semibold text-amber-50 transition-all hover:border-[#ff6a1f] hover:bg-[#ff6a1f]/10"
+            onClick={() => void loadSubmissions()}
+          >
+            <FaRotateRight className="text-amber-50/70" />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
+
+        <div className="mx-auto max-w-5xl p-6 pb-16 md:p-10">
+          <div className="mb-8 flex flex-col gap-4 border-b border-amber-50/10 pb-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#ff6a1f]">
+                Admin review
+              </p>
+              <h1 className="mt-1 text-3xl font-bold text-amber-50">
+                Pending submissions
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-amber-50/55">
+                Approve mentor profiles and publication records before they appear
+                on the public site.
+              </p>
+            </div>
+
+            <span className="w-fit rounded-lg border border-amber-50/15 bg-black px-3 py-2 text-sm text-amber-50/70">
               {totalPending} pending
             </span>
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-md border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-900 cursor-pointer"
-              onClick={() => void loadSubmissions()}
-            >
-              <FaRotateRight />
-              Refresh
-            </button>
           </div>
+
+          <div className="mb-6 flex flex-wrap gap-2 md:hidden">
+            <QueueTab
+              active={activeQueue === "publications"}
+              count={queueCounts.publications}
+              label="Publications"
+              onClick={() => setQueue("publications")}
+            />
+            <QueueTab
+              active={activeQueue === "mentors"}
+              count={queueCounts.mentors}
+              label="Mentors"
+              onClick={() => setQueue("mentors")}
+            />
+          </div>
+
+          {error ? <Alert tone="error">{error}</Alert> : null}
+          {status ? <Alert tone="success">{status}</Alert> : null}
+
+          {activeItems.length === 0 ? (
+            <EmptyState label={`No pending ${activeQueue}.`} />
+          ) : activeQueue === "publications" ? (
+            <div className="grid gap-4">
+              {publications.map((publication) => (
+                <PublicationReviewCard
+                  key={publication._id}
+                  isBusy={busyId === publication._id}
+                  publication={publication}
+                  onApprove={() =>
+                    void handlePublicationAction(publication._id, "approve")
+                  }
+                  onDecline={() =>
+                    void handlePublicationAction(publication._id, "decline")
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {mentors.map((mentor) => (
+                <MentorReviewCard
+                  key={mentor._id}
+                  isBusy={busyId === mentor._id}
+                  mentor={mentor}
+                  onApprove={() => void handleMentorAction(mentor._id, "approve")}
+                  onDecline={() => void handleMentorAction(mentor._id, "decline")}
+                />
+              ))}
+            </div>
+          )}
         </div>
-
-        <div className="mb-6 flex flex-wrap gap-2">
-          <QueueTab
-            active={activeQueue === "publications"}
-            count={queueCounts.publications}
-            label="Publications"
-            onClick={() => setActiveQueue("publications")}
-          />
-          <QueueTab
-            active={activeQueue === "mentors"}
-            count={queueCounts.mentors}
-            label="Mentors"
-            onClick={() => setActiveQueue("mentors")}
-          />
-        </div>
-
-        {error ? <Alert tone="error">{error}</Alert> : null}
-        {status ? <Alert tone="success">{status}</Alert> : null}
-
-        {activeItems.length === 0 ? (
-          <EmptyState label={`No pending ${activeQueue}.`} />
-        ) : activeQueue === "publications" ? (
-          <div className="grid gap-4">
-            {publications.map((publication) => (
-              <PublicationReviewCard
-                key={publication._id}
-                isBusy={busyId === publication._id}
-                publication={publication}
-                onApprove={() =>
-                  void handlePublicationAction(publication._id, "approve")
-                }
-                onDecline={() =>
-                  void handlePublicationAction(publication._id, "decline")
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {mentors.map((mentor) => (
-              <MentorReviewCard
-                key={mentor._id}
-                isBusy={busyId === mentor._id}
-                mentor={mentor}
-                onApprove={() => void handleMentorAction(mentor._id, "approve")}
-                onDecline={() => void handleMentorAction(mentor._id, "decline")}
-              />
-            ))}
-          </div>
-        )}
       </section>
     </main>
   );
@@ -267,15 +283,15 @@ const QueueTab = ({
 }) => (
   <button
     type="button"
-    className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${active
-      ? "bg-orange-600 text-white"
-      : "border border-slate-700 text-slate-300 hover:border-slate-500 hover:bg-slate-900"
+    className={`inline-flex cursor-pointer items-center justify-between gap-2 rounded-lg border-l-2 px-4 py-3 text-left text-sm transition-all duration-300 ${active
+      ? "border-[#ff6a1f] bg-gradient-to-r from-[#ff6a1f]/10 to-transparent font-semibold text-[#ff6a1f]"
+      : "border-transparent text-amber-50/60 hover:bg-amber-50/5 hover:text-amber-50"
       }`}
     onClick={onClick}
   >
     {label}
     <span
-      className={`rounded px-2 py-0.5 text-xs ${active ? "bg-white/15 text-white" : "bg-slate-800 text-slate-300"
+      className={`rounded px-2 py-0.5 text-xs ${active ? "bg-[#ff6a1f]/15 text-[#ffb088]" : "bg-amber-50/10 text-amber-50/55"
         }`}
     >
       {count}
@@ -294,16 +310,16 @@ const PublicationReviewCard = ({
   onDecline: () => void;
   publication: PendingPublication;
 }) => (
-  <article className="rounded-lg border border-slate-800 bg-slate-900 p-5">
+  <article className="rounded-lg border border-amber-50/10 bg-black p-5">
     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div className="min-w-0">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-400">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff6a1f]">
           Publication
         </p>
-        <h2 className="mt-2 text-xl font-bold text-white">
+        <h2 className="mt-2 text-xl font-bold text-amber-50">
           {publication.publishTitle}
         </h2>
-        <div className="mt-3 flex flex-wrap gap-3 text-sm text-slate-400">
+        <div className="mt-3 flex flex-wrap gap-3 text-sm text-amber-50/55">
           <span>{publication.author}</span>
           <span>{formatDate(publication.publishDate)}</span>
           {publication.journal ? <span>{publication.journal}</span> : null}
@@ -317,11 +333,11 @@ const PublicationReviewCard = ({
       />
     </div>
 
-    <p className="mt-4 line-clamp-4 text-sm leading-6 text-slate-300">
+    <p className="mt-4 line-clamp-4 text-sm leading-6 text-amber-50/70">
       {stripHtml(publication.content) || "No content provided."}
     </p>
 
-    <div className="mt-5 grid gap-3 border-t border-slate-800 pt-4 text-sm text-slate-400 md:grid-cols-2">
+    <div className="mt-5 grid gap-3 border-t border-amber-50/10 pt-4 text-sm text-amber-50/55 md:grid-cols-2">
       <InfoLine icon={<FaEnvelope />} label="Submitter" value={publication.authorGmail} />
       <InfoLine label="Submitted" value={formatDate(publication.createdAt)} />
     </div>
@@ -332,7 +348,7 @@ const PublicationReviewCard = ({
           <img
             key={image.publicId || image.url}
             alt={publication.publishTitle}
-            className="h-20 w-28 rounded object-cover"
+            className="h-20 w-28 rounded-lg border border-amber-50/10 object-cover"
             src={image.url}
           />
         ))}
@@ -352,7 +368,7 @@ const MentorReviewCard = ({
   onApprove: () => void;
   onDecline: () => void;
 }) => (
-  <article className="rounded-lg border border-slate-800 bg-slate-900 p-5">
+  <article className="rounded-lg border border-amber-50/10 bg-black p-5">
     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div className="flex min-w-0 gap-4">
         {mentor.avatarImage ? (
@@ -362,16 +378,16 @@ const MentorReviewCard = ({
             className="h-20 w-20 shrink-0 rounded-lg object-cover"
           />
         ) : (
-          <div className="grid h-20 w-20 shrink-0 place-items-center rounded-lg bg-slate-800 text-slate-400">
+          <div className="grid h-20 w-20 shrink-0 place-items-center rounded-lg bg-zinc-900 text-amber-50/45">
             <FaUserTie />
           </div>
         )}
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#ff6a1f]">
             Mentor
           </p>
-          <h2 className="mt-2 text-xl font-bold text-white">{mentor.fullName}</h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <h2 className="mt-2 text-xl font-bold text-amber-50">{mentor.fullName}</h2>
+          <p className="mt-2 text-sm text-amber-50/55">
             {[mentor.title, mentor.department].filter(Boolean).join(" | ")}
           </p>
         </div>
@@ -383,7 +399,7 @@ const MentorReviewCard = ({
       />
     </div>
 
-    <div className="mt-5 grid gap-3 border-t border-slate-800 pt-4 text-sm text-slate-400 md:grid-cols-2">
+    <div className="mt-5 grid gap-3 border-t border-amber-50/10 pt-4 text-sm text-amber-50/55 md:grid-cols-2">
       <InfoLine icon={<FaEnvelope />} label="Email" value={mentor.email} />
       <InfoLine label="Phone" value={mentor.phone || "-"} />
       <InfoLine label="Research areas" value={mentor.researchAreas || "-"} />
@@ -395,7 +411,7 @@ const MentorReviewCard = ({
     </div>
 
     {mentor.note ? (
-      <p className="mt-4 text-sm leading-6 text-slate-300">{mentor.note}</p>
+      <p className="mt-4 text-sm leading-6 text-amber-50/70">{mentor.note}</p>
     ) : null}
   </article>
 );
@@ -412,7 +428,7 @@ const ActionButtons = ({
   <div className="flex shrink-0 flex-wrap gap-2">
     <button
       type="button"
-      className="inline-flex items-center justify-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-amber-50 transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
       disabled={isBusy}
       onClick={onApprove}
     >
@@ -421,7 +437,7 @@ const ActionButtons = ({
     </button>
     <button
       type="button"
-      className="inline-flex items-center justify-center gap-2 rounded-md border border-red-500/50 px-4 py-2 text-sm font-semibold text-red-100 transition hover:bg-red-950/60 disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-500/50 px-4 py-2 text-sm font-semibold text-red-100 transition hover:bg-red-950/60 disabled:cursor-not-allowed disabled:opacity-60"
       disabled={isBusy}
       onClick={onDecline}
     >
@@ -441,11 +457,11 @@ const InfoLine = ({
   value: string;
 }) => (
   <div className="min-w-0">
-    <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase text-slate-500">
+    <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase text-amber-50/35">
       {icon}
       {label}
     </p>
-    <p className="wrap-break-word text-slate-300">{value || "-"}</p>
+    <p className="wrap-break-word text-amber-50/70">{value || "-"}</p>
   </div>
 );
 
@@ -457,7 +473,7 @@ const Alert = ({
   tone: "error" | "success";
 }) => (
   <div
-    className={`mb-6 rounded-md border px-4 py-3 text-sm ${tone === "error"
+    className={`mb-6 rounded-lg border px-4 py-3 text-sm ${tone === "error"
       ? "border-red-500/40 bg-red-950/50 text-red-100"
       : "border-emerald-500/40 bg-emerald-950/50 text-emerald-100"
       }`}
@@ -467,7 +483,7 @@ const Alert = ({
 );
 
 const EmptyState = ({ label }: { label: string }) => (
-  <div className="rounded-lg border border-slate-800 bg-slate-900 px-4 py-12 text-center text-sm text-slate-400">
+  <div className="rounded-lg border border-amber-50/10 bg-black px-4 py-12 text-center text-sm text-amber-50/50">
     {label}
   </div>
 );

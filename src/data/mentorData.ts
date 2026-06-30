@@ -3,6 +3,8 @@ export interface MentorItem {
   role: string;
   image?: string;
   description: string;
+  researchAreas?: string;
+  researchTopics?: string;
   links?: {
     website?: string;
     orcid?: string;

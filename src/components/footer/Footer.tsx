@@ -1,6 +1,4 @@
 import { FaEnvelope, FaFacebookF, FaPhone } from "react-icons/fa6";
-import fptUniversityLogo from '../../assets/logo-fptu.png'
-import fptLogoFixed from '../../assets/fpt_logo-removebg-preview_cropped.png'
 import resfes2026 from '../../assets/logo_src_white_nobg.png'
 import { useCheckMobile } from "../../hook/useCheckMobile";
 import { usePageContent } from "../../hook/usePageContent";
@@ -27,14 +25,14 @@ const Footer = () => {
           <div className="flex w-max animate-marquee">
             {/* Set 1 */}
             <div className="flex min-w-screen md:min-w-[80vw] lg:min-w-7xl shrink-0 items-center justify-around px-4">
-              <img src={fptUniversityLogo} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="FPTU logo" />
-              <img src={fptLogoFixed} className="h-28 sm:h-32 lg:h-36 scale-110 object-contain" alt="FPT 20 years logo" />
+              <img src={resfes2026} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="SRC 2026 logo" />
+              <img src={resfes2026} className="h-28 sm:h-32 lg:h-36 scale-110 object-contain" alt="SRC 2026 logo" />
               <img src={resfes2026} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="resfes2026 logo" />
             </div>
             {/* Set 2 */}
             <div className="flex min-w-screen md:min-w-[80vw] lg:min-w-7xl shrink-0 items-center justify-around px-4" aria-hidden="true">
-              <img src={fptUniversityLogo} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="FPTU logo" />
-              <img src={fptLogoFixed} className="h-28 sm:h-32 lg:h-36 scale-110 object-contain" alt="FPT 20 years logo" />
+              <img src={resfes2026} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="SRC 2026 logo" />
+              <img src={resfes2026} className="h-28 sm:h-32 lg:h-36 scale-110 object-contain" alt="SRC 2026 logo" />
               <img src={resfes2026} className="h-20 sm:h-24 lg:h-28 scale-110 object-contain" alt="resfes2026 logo" />
             </div>
           </div>

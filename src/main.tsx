@@ -13,11 +13,14 @@ import PublicationDetail from "./pages/publications/PublicationDetail.tsx";
 import PublicationSubmission from "./pages/publications/PublicationSubmission.tsx";
 import PublicationsList from "./pages/publications/PublicationsList.tsx";
 import SubmissionPage from "./pages/submission/SubmissionPage.tsx";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage.tsx";
 import AdminPage from "./pages/admin/AdminPage.tsx";
 import NewsAdminPage from "./pages/admin/NewsAdminPage.tsx";
 import NewsEditAdminPage from "./pages/admin/NewsEditAdminPage.tsx";
 import NewsUploadAdminPage from "./pages/admin/NewsUploadAdminPage.tsx";
 import SubmissionReviewAdminPage from "./pages/admin/SubmissionReviewAdminPage.tsx";
+import MentorAdminPage from "./pages/admin/MentorAdminPage.tsx";
+import PublicationAdminPage from "./pages/admin/PublicationAdminPage.tsx";
 import RegistrationPage from "./components/registration/RegistrationPage.tsx";
 import LoginPage from "./pages/authentication/Login.tsx";
 import SignUp from "./pages/authentication/Signup.tsx";
@@ -41,11 +44,14 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/submit/publication" element={<PublicationSubmission />} />
             <Route path="/submit/mentor" element={<MentorSubmission />} />
 
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/layout" element={<AdminPage />} />
             <Route path="/admin/news" element={<NewsAdminPage />} />
             <Route path="/admin/news/upload" element={<NewsUploadAdminPage />} />
             <Route path="/admin/news/:id/edit" element={<NewsEditAdminPage />} />
             <Route path="/admin/submissions" element={<SubmissionReviewAdminPage />} />
+            <Route path="/admin/mentors" element={<MentorAdminPage />} />
+            <Route path="/admin/publications" element={<PublicationAdminPage />} />
             <Route path="/register" element={<RegistrationPage />} />
             <Route path="/auth/login" element={<LoginPage />} />
             <Route path="/auth/signupabc" element={<SignUp />} />
